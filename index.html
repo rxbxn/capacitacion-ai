@@ -6,8 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IA para Champions Contables — Microsoft 365 Copilot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap"
     rel="stylesheet">
   <style>
     :root {
@@ -40,11 +41,63 @@
     }
 
     body {
-      font-family: 'Sora', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       background: #F7FAFD;
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
+    }
+
+    /* Inter typography scale */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      font-family: 'DM Serif Display', serif;
+      letter-spacing: -.01em;
+    }
+
+    p,
+    li,
+    span,
+    a,
+    button,
+    label,
+    input {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .label-xs {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .body-sm {
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.65;
+    }
+
+    .body-md {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+    .semibold {
+      font-weight: 600;
+    }
+
+    .light {
+      font-weight: 300;
     }
 
     /* ── HERO ───────────────────────────────── */
@@ -103,8 +156,8 @@
       align-items: center;
       gap: 8px;
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .12em;
+      font-weight: 500;
+      letter-spacing: .14em;
       text-transform: uppercase;
       color: var(--sky);
       margin-bottom: 20px;
@@ -133,10 +186,12 @@
 
     .hero-subtitle {
       font-size: 15px;
-      line-height: 1.7;
-      color: rgba(255, 255, 255, 0.58);
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(255, 255, 255, 0.55);
       max-width: 520px;
       margin-bottom: 36px;
+      letter-spacing: .01em;
     }
 
     .hero-badges {
@@ -147,7 +202,8 @@
 
     .hbadge {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
+      letter-spacing: .04em;
       padding: 5px 12px;
       border-radius: 20px;
       border: 1px solid;
@@ -282,10 +338,11 @@
       padding: 16px 20px;
       font-size: 13px;
       font-weight: 500;
+      letter-spacing: .01em;
       color: var(--muted);
       cursor: pointer;
       border-bottom: 2px solid transparent;
-      transition: all .15s;
+      transition: all .2s;
       white-space: nowrap;
     }
 
@@ -366,9 +423,10 @@
 
     .stat-l {
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 400;
       color: var(--muted);
-      line-height: 1.4;
+      line-height: 1.5;
+      letter-spacing: .01em;
     }
 
     /* pitch block */
@@ -387,8 +445,9 @@
     }
 
     .pitch-card h3 {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
+      letter-spacing: .01em;
       color: var(--navy);
       margin-bottom: 12px;
       display: flex;
@@ -398,7 +457,8 @@
 
     .pitch-card p {
       font-size: 13.5px;
-      line-height: 1.75;
+      font-weight: 300;
+      line-height: 1.8;
       color: var(--muted);
     }
 
@@ -411,11 +471,12 @@
 
     .pitch-card ul li {
       font-size: 13px;
+      font-weight: 400;
       color: var(--muted);
       display: flex;
       align-items: flex-start;
       gap: 8px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .pitch-card ul li::before {
@@ -436,13 +497,16 @@
       font-size: 32px;
       color: var(--navy);
       margin-bottom: 8px;
+      letter-spacing: -.02em;
     }
 
     .section-head p {
       font-size: 14px;
+      font-weight: 300;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.75;
       max-width: 640px;
+      letter-spacing: .01em;
     }
 
     .apps-grid {
@@ -483,20 +547,22 @@
       font-size: 22px;
       font-weight: 800;
       flex-shrink: 0;
-      font-family: 'Sora', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     .app-name-block .app-name {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
+      letter-spacing: -.01em;
       color: var(--navy);
     }
 
     .app-name-block .app-sub {
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 400;
       color: var(--muted);
       margin-top: 2px;
+      letter-spacing: .01em;
     }
 
     .app-body {
@@ -505,9 +571,11 @@
 
     .app-desc {
       font-size: 13px;
-      line-height: 1.65;
+      font-weight: 300;
+      line-height: 1.7;
       color: var(--muted);
       margin-bottom: 16px;
+      letter-spacing: .01em;
     }
 
     .skill-tags {
@@ -519,7 +587,8 @@
 
     .stag {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
+      letter-spacing: .02em;
       padding: 4px 9px;
       border-radius: 20px;
       background: var(--ice);
@@ -534,8 +603,8 @@
 
     .use-cases h4 {
       font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .1em;
+      font-weight: 600;
+      letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--blue);
       margin-bottom: 8px;
@@ -550,11 +619,12 @@
 
     .use-cases ul li {
       font-size: 12px;
+      font-weight: 400;
       color: var(--text);
       display: flex;
       align-items: baseline;
       gap: 6px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .use-cases ul li::before {
@@ -596,7 +666,7 @@
       padding: 4px 10px;
       cursor: pointer;
       transition: all .15s;
-      font-family: 'Sora', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     .skill-link:hover {
@@ -627,7 +697,7 @@
       cursor: pointer;
       text-align: left;
       transition: all .18s;
-      font-family: 'Sora', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -658,13 +728,16 @@
     .sbtn-text .sbtn-name {
       font-size: 13px;
       font-weight: 600;
+      letter-spacing: -.01em;
       color: var(--navy);
     }
 
     .sbtn-text .sbtn-level {
       font-size: 11px;
+      font-weight: 400;
       color: var(--muted);
       margin-top: 2px;
+      letter-spacing: .01em;
     }
 
     .skill-detail-panel {
@@ -703,14 +776,18 @@
 
     .sdp-meta p {
       font-size: 13px;
+      font-weight: 300;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.7;
+      letter-spacing: .01em;
     }
 
     .level-pill {
       display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
       padding: 3px 10px;
       border-radius: 20px;
       margin-top: 6px;
@@ -718,15 +795,17 @@
 
     .sdp-desc {
       font-size: 14px;
+      font-weight: 300;
       line-height: 1.8;
       color: var(--muted);
       margin-bottom: 24px;
+      letter-spacing: .01em;
     }
 
     .sdp-section-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .1em;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--blue);
       margin-bottom: 12px;
@@ -771,9 +850,11 @@
       border-radius: 0 10px 10px 0;
       padding: 12px 16px;
       font-size: 13px;
+      font-weight: 300;
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.65;
       font-style: italic;
+      letter-spacing: .01em;
     }
 
     .prompt-item strong {
@@ -782,7 +863,7 @@
       color: var(--blue);
       display: block;
       font-size: 10px;
-      letter-spacing: .08em;
+      letter-spacing: .1em;
       text-transform: uppercase;
       margin-bottom: 4px;
     }
@@ -844,14 +925,15 @@
     }
 
     .module-header h3 {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 600;
+      letter-spacing: -.01em;
       color: var(--navy);
     }
 
     .module-header .mod-hrs {
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--blue);
       background: var(--ice);
       border: 1px solid var(--border);
@@ -859,13 +941,16 @@
       padding: 4px 12px;
       white-space: nowrap;
       flex-shrink: 0;
+      letter-spacing: .02em;
     }
 
     .module-desc {
       font-size: 13px;
+      font-weight: 300;
       color: var(--muted);
-      line-height: 1.65;
+      line-height: 1.75;
       margin-bottom: 16px;
+      letter-spacing: .01em;
     }
 
     .mod-topics {
@@ -876,7 +961,8 @@
 
     .mod-topic {
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 400;
+      letter-spacing: .01em;
       padding: 4px 10px;
       border-radius: 6px;
       border: 1px solid var(--border);
@@ -969,7 +1055,7 @@
     .btn-main {
       background: var(--blue);
       color: var(--white);
-      font-family: 'Sora', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       font-size: 13px;
       font-weight: 600;
       padding: 13px 28px;
@@ -986,7 +1072,7 @@
     .btn-ghost {
       background: transparent;
       color: rgba(255, 255, 255, 0.7);
-      font-family: 'Sora', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       font-size: 13px;
       font-weight: 600;
       padding: 13px 28px;
@@ -1009,7 +1095,7 @@
     .btn-whatsapp {
       background: #25D366;
       color: var(--white);
-      font-family: 'Sora', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       font-size: 13px;
       font-weight: 700;
       padding: 13px 28px;
