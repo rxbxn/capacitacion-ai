@@ -1,1751 +1,2494 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IA para Champions Contables — Microsoft 365 Copilot</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <style>
-    :root {
-      --navy: #0D1B3E;
-      --blue: #0078D4;
-      --mid: #1B5EAD;
-      --sky: #50B4F0;
-      --ice: #E8F4FD;
-      --gold: #FFB900;
-      --teal: #00B4C8;
-      --green: #107C10;
-      --dark: #1A1A2E;
-      --text: #1C2B3A;
-      --muted: #5A6A7A;
-      --pale: #F0F6FC;
-      --white: #FFFFFF;
-      --border: rgba(0, 120, 212, 0.15);
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 18px;
-      --radius-xl: 24px;
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Sora', sans-serif;
-      background: #F7FAFD;
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── SCROLL PROGRESS ──────────────────────────── */
-    #scroll-progress {
-      position: fixed;
-      top: 0; left: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--blue), var(--teal), var(--sky));
-      z-index: 9999;
-      width: 0%;
-      transition: width 0.1s linear;
-      box-shadow: 0 0 8px rgba(0, 120, 212, 0.6);
-    }
-
-    /* ── HERO ─────────────────────────────────────── */
-    .hero {
-      background: var(--navy);
-      position: relative;
-      overflow: hidden;
-      padding: 0;
-    }
-
-    #hero-canvas {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.55;
-    }
-
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,120,212,0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,120,212,0.07) 1px, transparent 1px);
-      background-size: 48px 48px;
-      animation: gridPulse 8s ease-in-out infinite;
-    }
-
-    @keyframes gridPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .hero-glow {
-      position: absolute;
-      width: 700px;
-      height: 700px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,120,212,0.22) 0%, transparent 70%);
-      top: -250px; right: -180px;
-      pointer-events: none;
-      animation: glowFloat 6s ease-in-out infinite;
-    }
-
-    .hero-glow2 {
-      position: absolute;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,180,200,0.14) 0%, transparent 70%);
-      bottom: -120px; left: 40px;
-      pointer-events: none;
-      animation: glowFloat 8s ease-in-out infinite reverse;
-    }
-
-    @keyframes glowFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(15px, -20px) scale(1.05); }
-    }
-
-    .hero-inner {
-      position: relative;
-      z-index: 2;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 80px 48px 64px;
-      display: grid;
-      grid-template-columns: 1fr 390px;
-      gap: 56px;
-      align-items: center;
-    }
-
-    .hero-left { opacity: 0; transform: translateY(24px); }
-    .hero-left.in { animation: fadeUpIn 0.75s var(--ease-out) forwards; }
-    .m365-panel-wrap { opacity: 0; transform: translateY(24px); }
-    .m365-panel-wrap.in { animation: fadeUpIn 0.75s var(--ease-out) 0.2s forwards; }
-
-    @keyframes fadeUpIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--sky);
-      margin-bottom: 22px;
-    }
-
-    .hero-eyebrow::before {
-      content: "";
-      width: 28px; height: 2px;
-      background: linear-gradient(90deg, var(--sky), var(--teal));
-      display: block;
-      border-radius: 2px;
-    }
-
-    .hero-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(38px, 5.5vw, 60px);
-      line-height: 1.06;
-      color: var(--white);
-      margin-bottom: 20px;
-    }
-
-    .hero-title em {
-      font-style: italic;
-      background: linear-gradient(135deg, var(--sky), var(--teal));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: 15px;
-      line-height: 1.75;
-      color: rgba(255,255,255,0.55);
-      max-width: 520px;
-      margin-bottom: 40px;
-    }
-
-    .hero-badges {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .hbadge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid;
-      transition: transform 0.2s var(--ease-spring), box-shadow 0.2s;
-    }
-
-    .hbadge:hover { transform: translateY(-2px); }
-
-    .hbadge.blue {
-      color: var(--sky);
-      border-color: rgba(80,180,240,0.35);
-      background: rgba(80,180,240,0.08);
-    }
-    .hbadge.gold {
-      color: var(--gold);
-      border-color: rgba(255,185,0,0.35);
-      background: rgba(255,185,0,0.08);
-    }
-    .hbadge.white {
-      color: rgba(255,255,255,0.7);
-      border-color: rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.05);
-    }
-
-    /* Hero panel */
-    .m365-panel {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      backdrop-filter: blur(12px);
-      animation: panelFloat 5s ease-in-out infinite;
-    }
-
-    @keyframes panelFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    .m365-title {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-
-    .m365-apps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .m365-app {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding: 12px 8px;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-      cursor: pointer;
-      transition: all 0.25s var(--ease-spring);
-      text-decoration: none;
-    }
-
-    .m365-app:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(80,180,240,0.45);
-      transform: translateY(-4px) scale(1.03);
-      box-shadow: 0 8px 20px rgba(0,120,212,0.25);
-    }
-
-    .m365-app .app-icon {
-      width: 36px; height: 36px;
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 800;
-      font-family: 'Sora', sans-serif;
-    }
-
-    .m365-app .app-name {
-      font-size: 9.5px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.55);
-      text-align: center;
-      line-height: 1.2;
-    }
-
-    .copilot-badge {
-      margin-top: 16px;
-      padding: 12px 14px;
-      background: linear-gradient(135deg, rgba(0,120,212,0.28), rgba(0,180,200,0.18));
-      border: 1px solid rgba(80,180,240,0.35);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: badgePulse 3s ease-in-out infinite;
-    }
-
-    @keyframes badgePulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(80,180,240,0); }
-      50% { box-shadow: 0 0 0 6px rgba(80,180,240,0.08); }
-    }
-
-    .cb-icon { font-size: 20px; flex-shrink: 0; color: var(--sky); }
-    .cb-text { font-size: 12px; color: rgba(255,255,255,0.78); line-height: 1.45; }
-    .cb-text strong { color: var(--sky); font-weight: 600; }
-
-    /* ── NAV ─────────────────────────────────────── */
-    .nav {
-      background: rgba(255,255,255,0.95);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      transition: box-shadow 0.3s;
-    }
-
-    .nav.scrolled { box-shadow: 0 4px 24px rgba(0,120,212,0.08); }
-
-    .nav-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 48px;
-      display: flex;
-      gap: 0;
-      position: relative;
-    }
-
-    .nav-tab {
-      padding: 17px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: color 0.2s;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .nav-tab i { font-size: 15px; opacity: 0.7; }
-    .nav-tab:hover { color: var(--blue); }
-    .nav-tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
-    .nav-tab.active i { opacity: 1; }
-
-    /* ── MAIN ─────────────────────────────────────── */
-    .main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 56px 48px;
-    }
-
-    .section { display: none; }
-    .section.active { display: block; }
-
-    /* reveal animations */
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* stagger children */
-    .reveal-stagger > * {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
-    }
-    .reveal-stagger.visible > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0s; }
-    .reveal-stagger.visible > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.08s; }
-    .reveal-stagger.visible > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.16s; }
-    .reveal-stagger.visible > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.24s; }
-    .reveal-stagger.visible > *:nth-child(5) { opacity: 1; transform: none; transition-delay: 0.32s; }
-    .reveal-stagger.visible > *:nth-child(6) { opacity: 1; transform: none; transition-delay: 0.40s; }
-    .reveal-stagger.visible > *:nth-child(7) { opacity: 1; transform: none; transition-delay: 0.48s; }
-    .reveal-stagger.visible > *:nth-child(8) { opacity: 1; transform: none; transition-delay: 0.56s; }
-
-    /* ── SECTION: OVERVIEW ─────────────────────────── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 48px;
-    }
-
-    .stat-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 28px 20px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      cursor: default;
-      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 16px 40px rgba(0,120,212,0.1);
-    }
-
-    .stat-card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-    }
-
-    .stat-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0) 60%, rgba(0,120,212,0.03));
-      pointer-events: none;
-    }
-
-    .stat-card.c-blue::before { background: linear-gradient(90deg, var(--blue), var(--sky)); }
-    .stat-card.c-gold::before { background: linear-gradient(90deg, var(--gold), #FFD700); }
-    .stat-card.c-teal::before { background: linear-gradient(90deg, var(--teal), #00D4E8); }
-    .stat-card.c-green::before { background: linear-gradient(90deg, var(--green), #00B050); }
-
-    .stat-n {
-      font-family: 'DM Serif Display', serif;
-      font-size: 48px;
-      color: var(--navy);
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .stat-l {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    /* pitch block */
-    .pitch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 48px;
-    }
-
-    .pitch-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s, border-color 0.3s;
-    }
-
-    .pitch-card::after {
-      content: "";
-      position: absolute;
-      top: -50%; right: -50%;
-      width: 100%; height: 100%;
-      background: radial-gradient(circle, rgba(0,120,212,0.06) 0%, transparent 70%);
-      transform: scale(0);
-      transition: transform 0.5s var(--ease-out);
-      pointer-events: none;
-    }
-
-    .pitch-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,120,212,0.08); border-color: rgba(0,120,212,0.25); }
-    .pitch-card:hover::after { transform: scale(2); }
-
-    .pitch-card h3 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--navy);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pitch-card h3 i { font-size: 19px; color: var(--blue); }
-
-    .pitch-card p {
-      font-size: 13.5px;
-      line-height: 1.78;
-      color: var(--muted);
-    }
-
-    .pitch-card ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
-    .pitch-card ul li {
-      font-size: 13px;
-      color: var(--muted);
-      display: flex;
-      align-items: flex-start;
-      gap: 9px;
-      line-height: 1.55;
-    }
-    .pitch-card ul li i { color: var(--blue); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-
-    /* ── SECTION: APPS ─────────────────────────────── */
-    .section-head { margin-bottom: 36px; }
-    .section-head h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 34px;
-      color: var(--navy);
-      margin-bottom: 10px;
-    }
-    .section-head p {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.65;
-      max-width: 640px;
-    }
-
-    .apps-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .app-card {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s, border-color 0.3s;
-      cursor: pointer;
-      position: relative;
-    }
-
-    /* shimmer on hover */
-    .app-card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: -100%;
-      width: 60%; height: 100%;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.6) 50%, transparent 60%);
-      transition: left 0.5s ease;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .app-card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(0,120,212,0.12); border-color: rgba(0,120,212,0.32); }
-    .app-card:hover::before { left: 120%; }
-
-    .app-header {
-      padding: 22px 22px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .app-ico {
-      width: 50px; height: 50px;
-      border-radius: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 800;
-      flex-shrink: 0;
-      font-family: 'Sora', sans-serif;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: transform 0.3s var(--ease-spring);
-    }
-
-    .app-card:hover .app-ico { transform: scale(1.1) rotate(-3deg); }
-
-    .app-name-block .app-name { font-size: 16px; font-weight: 600; color: var(--navy); }
-    .app-name-block .app-sub { font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 2px; }
-
-    .app-body { padding: 0 22px 22px; }
-    .app-desc { font-size: 13px; line-height: 1.68; color: var(--muted); margin-bottom: 16px; }
-
-    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-    .stag {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: var(--ice);
-      color: var(--mid);
-      border: 1px solid rgba(0,120,212,0.15);
-      transition: background 0.2s, color 0.2s;
-    }
-    .app-card:hover .stag { background: rgba(0,120,212,0.08); }
-
-    .use-cases { border-top: 1px solid var(--border); padding-top: 14px; }
-    .use-cases h4 {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 9px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .use-cases h4 i { font-size: 12px; }
-    .use-cases ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .use-cases ul li {
-      font-size: 12px;
-      color: var(--text);
-      display: flex;
-      align-items: flex-start;
-      gap: 7px;
-      line-height: 1.45;
-    }
-    .use-cases ul li i { font-size: 11px; color: var(--blue); flex-shrink: 0; margin-top: 2px; }
-
-    .app-footer {
-      background: var(--pale);
-      padding: 11px 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--border);
-    }
-
-    .copilot-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--blue);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .copilot-label i { font-size: 13px; }
-
-    /* ── SECTION: SKILLS ──────────────────────────── */
-    .skills-layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 24px;
-      min-height: 560px;
-    }
-
-    .skills-sidebar { display: flex; flex-direction: column; gap: 8px; }
-
-    .skill-btn {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 16px 18px;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.22s var(--ease-out);
-      font-family: 'Sora', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .skill-btn::after {
-      content: "";
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--blue);
-      transform: scaleY(0);
-      transition: transform 0.2s var(--ease-spring);
-      border-radius: 0 2px 2px 0;
-    }
-
-    .skill-btn:hover { border-color: rgba(0,120,212,0.35); background: var(--ice); }
-    .skill-btn.active { border-color: var(--blue); background: linear-gradient(135deg, var(--ice), #fff); box-shadow: 0 4px 20px rgba(0,120,212,0.12); }
-    .skill-btn.active::after { transform: scaleY(1); }
-
-    .sbtn-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-      transition: transform 0.3s var(--ease-spring);
-    }
-    .skill-btn:hover .sbtn-icon { transform: scale(1.1); }
-    .skill-btn.active .sbtn-icon { transform: scale(1.05); }
-
-    .sbtn-text .sbtn-name { font-size: 13px; font-weight: 600; color: var(--navy); }
-    .sbtn-text .sbtn-level { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-    .skill-detail-panel {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      transition: opacity 0.2s, transform 0.2s var(--ease-out);
-    }
-
-    .skill-detail-panel.switching { opacity: 0; transform: translateX(8px); }
-
-    .sdp-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 20px;
-      margin-bottom: 28px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .sdp-icon {
-      width: 64px; height: 64px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      flex-shrink: 0;
-    }
-
-    .sdp-meta h2 { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--navy); margin-bottom: 5px; }
-    .sdp-meta p { font-size: 13px; color: var(--muted); line-height: 1.55; }
-    .level-pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 7px; }
-
-    .sdp-desc { font-size: 14px; line-height: 1.8; color: var(--muted); margin-bottom: 24px; }
-
-    .sdp-section-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .sdp-section-title i { font-size: 13px; }
-
-    .apps-used { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
-    .app-pill {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--pale);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--navy);
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .app-pill:hover { border-color: rgba(0,120,212,0.3); background: var(--ice); }
-    .app-pill .ap-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-    .prompts-list { display: flex; flex-direction: column; gap: 10px; }
-    .prompt-item {
-      background: var(--pale);
-      border-left: 3px solid var(--blue);
-      border-radius: 0 10px 10px 0;
-      padding: 14px 16px;
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.55;
-      font-style: italic;
-      transition: background 0.2s, border-color 0.2s;
-      cursor: default;
-    }
-    .prompt-item:hover { background: var(--ice); border-left-color: var(--teal); }
-    .prompt-item strong {
-      font-style: normal;
-      font-weight: 700;
-      color: var(--blue);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      letter-spacing: .09em;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-    .prompt-item strong i { font-size: 11px; }
-
-    /* ── SECTION: MÓDULOS ──────────────────────────── */
-    .modules-timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      position: relative;
-    }
-
-    .modules-timeline::before {
-      content: "";
-      position: absolute;
-      left: 31px;
-      top: 32px; bottom: 32px;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--blue), var(--teal), var(--green));
-    }
-
-    .module-item {
-      display: grid;
-      grid-template-columns: 64px 1fr;
-      gap: 24px;
-      margin-bottom: 24px;
-      align-items: flex-start;
-    }
-
-    .module-num {
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Serif Display', serif;
-      font-size: 24px;
-      color: var(--white);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 2;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s;
-    }
-
-    .module-item:hover .module-num { transform: scale(1.1); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
-
-    .module-body {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 24px 28px;
-      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s, border-color 0.3s;
-    }
-
-    .module-item:hover .module-body { transform: translateX(4px); box-shadow: 0 8px 32px rgba(0,120,212,0.08); border-color: rgba(0,120,212,0.25); }
-
-    .module-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
-
-    .module-header h3 { font-size: 17px; font-weight: 600; color: var(--navy); }
-    .module-header .mod-hrs {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--blue);
-      background: var(--ice);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 4px 12px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .module-header .mod-hrs i { font-size: 13px; }
-
-    .module-desc { font-size: 13px; color: var(--muted); line-height: 1.68; margin-bottom: 16px; }
-    .mod-topics { display: flex; flex-wrap: wrap; gap: 7px; }
-    .mod-topic {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      color: var(--mid);
-      background: var(--pale);
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-    }
-    .mod-topic:hover { background: var(--ice); border-color: rgba(0,120,212,0.3); color: var(--blue); }
-
-    .mod-apps {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .mod-apps span.label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-right: 4px;
-    }
-
-    .mod-app-tag {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 6px;
-      color: var(--white);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      transition: transform 0.2s var(--ease-spring);
-    }
-    .mod-app-tag:hover { transform: translateY(-2px); }
-
-    /* ── FOOTER CTA ──────────────────────────────── */
-    .footer-cta {
-      background: var(--navy);
-      margin-top: 72px;
-      padding: 64px 48px 0;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .footer-cta::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,120,212,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,120,212,0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-
-    .footer-cta-inner {
-      position: relative;
-      z-index: 2;
-      max-width: 640px;
-      margin: 0 auto;
-      padding-bottom: 60px;
-    }
-
-    .footer-cta h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(28px, 4vw, 38px);
-      color: var(--white);
-      margin-bottom: 14px;
-      line-height: 1.22;
-    }
-
-    .footer-cta h2 em {
-      font-style: italic;
-      background: linear-gradient(135deg, var(--sky), var(--teal));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .footer-cta p {
-      font-size: 14px;
-      color: rgba(255,255,255,0.48);
-      line-height: 1.72;
-      margin-bottom: 36px;
-    }
-
-    .cta-btns {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    /* buttons */
-    .btn-main {
-      background: linear-gradient(135deg, var(--blue), var(--mid));
-      color: var(--white);
-      font-family: 'Sora', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 13px 28px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s var(--ease-spring), box-shadow 0.2s, opacity 0.15s;
-      position: relative;
-      overflow: hidden;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .btn-main::after {
-      content: "";
-      position: absolute;
-      top: 0; left: -100%; width: 60%; height: 100%;
-      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%);
-      transition: left 0.5s ease;
-    }
-    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,120,212,0.4); }
-    .btn-main:hover::after { left: 120%; }
-    .btn-main:active { transform: translateY(0); }
-
-    .btn-ghost {
-      background: transparent;
-      color: rgba(255,255,255,0.7);
-      font-family: 'Sora', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 13px 28px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.2);
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--white); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
-
-    .btn-whatsapp {
-      background: linear-gradient(135deg, #25D366, #128C7E);
-      color: var(--white);
-      font-family: 'Sora', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 13px 28px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.25s var(--ease-spring);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 20px rgba(37,211,102,0.3);
-    }
-    .btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(37,211,102,0.45); }
-    .btn-whatsapp svg { width: 17px; height: 17px; flex-shrink: 0; }
-
-    /* ── CONTACT STRIP ──────────────────────────── */
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA para Champions Contables — Microsoft 365 Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0D1B3E;
+    --blue:   #0078D4;
+    --mid:    #1B5EAD;
+    --sky:    #50B4F0;
+    --ice:    #E8F4FD;
+    --gold:   #FFB900;
+    --teal:   #00B4C8;
+    --green:  #107C10;
+    --dark:   #1A1A2E;
+    --text:   #1C2B3A;
+    --muted:  #5A6A7A;
+    --pale:   #F0F6FC;
+    --white:  #FFFFFF;
+    --border: rgba(0,120,212,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #F7FAFD;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Inter typography scale */
+  h1, h2, h3, h4, h5 { font-family: 'DM Serif Display', serif; letter-spacing: -.01em; }
+  p, li, span, a, button, label, input { font-family: 'Inter', system-ui, sans-serif; }
+
+  .label-xs {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .body-sm  { font-size: 13px; font-weight: 400; line-height: 1.65; }
+  .body-md  { font-size: 14px; font-weight: 400; line-height: 1.7; }
+  .semibold { font-weight: 600; }
+  .light    { font-weight: 300; }
+
+  /* ── HERO ───────────────────────────────── */
+  .hero {
+    background: var(--navy);
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,120,212,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,120,212,0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,120,212,0.25) 0%, transparent 70%);
+    top: -200px; right: -150px;
+    pointer-events: none;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,180,200,0.15) 0%, transparent 70%);
+    bottom: -100px; left: 50px;
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative; z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 72px 48px 56px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 20px;
+  }
+
+  .hero-eyebrow::before {
+    content: "";
+    width: 24px; height: 2px;
+    background: var(--sky);
+    display: block;
+  }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.08;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--sky);
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: rgba(255,255,255,0.55);
+    max-width: 520px;
+    margin-bottom: 36px;
+    letter-spacing: .01em;
+  }
+
+  .hero-badges {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+
+  .hbadge {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+
+  .hbadge.blue  { color: var(--sky);  border-color: rgba(80,180,240,0.35); background: rgba(80,180,240,0.08); }
+  .hbadge.gold  { color: var(--gold); border-color: rgba(255,185,0,0.35);  background: rgba(255,185,0,0.08); }
+  .hbadge.white { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.05); }
+
+  /* Hero right: M365 wheel */
+  .m365-panel {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 28px;
+    backdrop-filter: blur(8px);
+  }
+
+  .m365-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .m365-apps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .m365-app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+  }
+
+  .m365-app:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(80,180,240,0.4);
+    transform: translateY(-2px);
+  }
+
+  .m365-app .app-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .m365-app .app-name {
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .copilot-badge {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, rgba(0,120,212,0.3), rgba(0,180,200,0.2));
+    border: 1px solid rgba(0,120,212,0.4);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .copilot-badge .cb-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .copilot-badge .cb-text {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.4;
+  }
+
+  .copilot-badge .cb-text strong {
+    color: var(--sky);
+    font-weight: 600;
+  }
+
+  /* ── NAV BAR ──────────────────────────── */
+  .nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 48px;
+    display: flex;
+    gap: 0;
+  }
+
+  .nav-tab {
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .01em;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+
+  .nav-tab:hover { color: var(--blue); }
+  .nav-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  /* ── MAIN ────────────────────────────── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 56px 48px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── SECTION: OVERVIEW ─────────────────── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .stat-card.c-blue::before  { background: var(--blue); }
+  .stat-card.c-gold::before  { background: var(--gold); }
+  .stat-card.c-teal::before  { background: var(--teal); }
+  .stat-card.c-green::before { background: var(--green); }
+
+  .stat-n {
+    font-family: 'DM Serif Display', serif;
+    font-size: 44px;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-l {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.5;
+    letter-spacing: .01em;
+  }
+
+  /* pitch block */
+  .pitch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .pitch-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .pitch-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .01em;
+    color: var(--navy);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pitch-card p {
+    font-size: 13.5px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .pitch-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pitch-card ul li {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.6;
+  }
+
+  .pitch-card ul li::before {
+    content: "→";
+    color: var(--blue);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── SECTION: APPS ─────────────────────── */
+  .section-head {
+    margin-bottom: 32px;
+  }
+
+  .section-head h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    color: var(--navy);
+    margin-bottom: 8px;
+    letter-spacing: -.02em;
+  }
+
+  .section-head p {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 640px;
+    letter-spacing: .01em;
+  }
+
+  .apps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .app-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    cursor: pointer;
+  }
+
+  .app-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,120,212,0.1);
+    border-color: rgba(0,120,212,0.3);
+  }
+
+  .app-header {
+    padding: 20px 22px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .app-ico {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    flex-shrink: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .app-name-block .app-name {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--navy);
+  }
+
+  .app-name-block .app-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: .01em;
+  }
+
+  .app-body { padding: 0 22px 22px; }
+
+  .app-desc {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-bottom: 16px;
+    letter-spacing: .01em;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .stag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .02em;
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: var(--ice);
+    color: var(--mid);
+    border: 1px solid rgba(0,120,212,0.15);
+  }
+
+  .use-cases {
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  .use-cases h4 {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+
+  .use-cases ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .use-cases ul li {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    line-height: 1.5;
+  }
+
+  .use-cases ul li::before {
+    content: "✦";
+    font-size: 8px;
+    color: var(--blue);
+    flex-shrink: 0;
+  }
+
+  .app-footer {
+    background: var(--pale);
+    padding: 12px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .copilot-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .copilot-label::before {
+    content: "✦";
+    font-size: 10px;
+  }
+
+  .skill-link {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .skill-link:hover {
+    background: var(--blue);
+    color: var(--white);
+    border-color: var(--blue);
+  }
+
+  /* ── SECTION: SKILLS ───────────────────── */
+  .skills-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    min-height: 560px;
+  }
+
+  .skills-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .skill-btn {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: all .18s;
+    font-family: 'Inter', system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .skill-btn:hover { border-color: rgba(0,120,212,0.35); background: var(--ice); }
+
+  .skill-btn.active {
+    border-color: var(--blue);
+    background: linear-gradient(135deg, var(--ice), #fff);
+    box-shadow: 0 4px 16px rgba(0,120,212,0.12);
+  }
+
+  .sbtn-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .sbtn-text .sbtn-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--navy);
+  }
+
+  .sbtn-text .sbtn-level {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: .01em;
+  }
+
+  .skill-detail-panel {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    padding: 32px;
+  }
+
+  .sdp-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sdp-icon {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .sdp-meta h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .sdp-meta p {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.7;
+    letter-spacing: .01em;
+  }
+
+  .level-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+  }
+
+  .sdp-desc {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 24px;
+    letter-spacing: .01em;
+  }
+
+  .sdp-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 12px;
+  }
+
+  .apps-used {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .app-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--pale);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .app-pill .ap-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .prompts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .prompt-item {
+    background: var(--pale);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.65;
+    font-style: italic;
+    letter-spacing: .01em;
+  }
+
+  .prompt-item strong {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--blue);
+    display: block;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  /* ── SECTION: MÓDULOS ───────────────────── */
+  .modules-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .modules-timeline::before {
+    content: "";
+    position: absolute;
+    left: 31px; top: 32px; bottom: 32px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--blue), var(--teal));
+  }
+
+  .module-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: flex-start;
+  }
+
+  .module-num {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--white);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .module-body {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+  }
+
+  .module-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .module-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--navy);
+  }
+
+  .module-header .mod-hrs {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--blue);
+    background: var(--ice);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: .02em;
+  }
+
+  .module-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 16px;
+    letter-spacing: .01em;
+  }
+
+  .mod-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .mod-topic {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: .01em;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--mid);
+    background: var(--pale);
+  }
+
+  .mod-apps {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .mod-apps span.label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+
+  .mod-app-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 6px;
+    color: var(--white);
+  }
+
+  /* ── FOOTER CTA ─────────────────────────── */
+  .footer-cta {
+    background: var(--navy);
+    margin-top: 72px;
+    padding: 56px 48px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-cta::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,120,212,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,120,212,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .footer-cta-inner { position: relative; z-index: 2; max-width: 600px; margin: 0 auto; padding-bottom: 56px; }
+
+  .footer-cta h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--white);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .footer-cta h2 em { color: var(--sky); font-style: italic; }
+
+  .footer-cta p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-main {
+    background: var(--blue);
+    color: var(--white);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 13px 28px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+
+  .btn-main:hover { opacity: .85; }
+
+  .btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 13px 28px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: all .15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-ghost:hover { background: rgba(255,255,255,0.07); color: var(--white); }
+
+  /* WhatsApp button */
+  .btn-whatsapp {
+    background: #25D366;
+    color: var(--white);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 13px 28px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.3);
+  }
+
+  .btn-whatsapp:hover {
+    background: #20b858;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(37,211,102,0.45);
+  }
+
+  .btn-whatsapp svg {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+  }
+
+  /* ── CONTACT STRIP ──────────────────────── */
+  .contact-strip {
+    position: relative; z-index: 2;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    align-items: center;
+  }
+
+  .contact-divider {
+    background: rgba(255,255,255,0.08);
+    height: 56px;
+    align-self: center;
+    margin: 0 48px;
+  }
+
+  .contact-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .contact-card-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .contact-card-icon svg {
+    width: 22px; height: 22px;
+  }
+
+  .contact-card-body {
+    text-align: left;
+  }
+
+  .contact-card-body .cc-role {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 4px;
+  }
+
+  .contact-card-body .cc-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 5px;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+  }
+
+  .contact-card-body .cc-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .cc-link {
+    font-size: 12px;
+    color: rgba(255,255,255,0.38);
+    font-weight: 400;
+    text-decoration: none;
+    transition: color .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }
+
+  .cc-link:hover { color: var(--sky); }
+
+  .cc-link svg {
+    width: 13px; height: 13px;
+    opacity: .6;
+    flex-shrink: 0;
+  }
+
+  .cc-link-sep {
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER BAR ─────────────────────────── */
+  .footer-bar {
+    position: relative; z-index: 2;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .footer-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .footer-gh-link {
+    font-size: 11px;
+    color: rgba(255,255,255,0.28);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color .15s;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .footer-gh-link:hover { color: rgba(255,255,255,0.6); }
+
+  .footer-gh-link svg {
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+  }
+
+  .footer-bar p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    font-weight: 400;
+    margin: 0;
+  }
+
+  /* ── OBJETIVO BLOCK ─────────────────────── */
+  .obj-block {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 32px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  .obj-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--ice);
+    color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .obj-icon svg { width: 22px; height: 22px; }
+
+  .obj-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+
+  .obj-text {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--muted);
+    letter-spacing: .01em;
+  }
+
+  /* ── COMPROMISO BLOCK ───────────────────── */
+  .compromiso-block {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 24px;
+  }
+
+  .compromiso-head {
+    margin-bottom: 24px;
+  }
+
+  .comp-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+
+  .comp-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    letter-spacing: -.01em;
+  }
+
+  .compromisos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .comp-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--pale);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .comp-item:hover {
+    border-color: rgba(0,120,212,0.25);
+    box-shadow: 0 4px 14px rgba(0,120,212,0.07);
+  }
+
+  .comp-check {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .comp-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+    letter-spacing: -.01em;
+  }
+
+  .comp-desc {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.65;
+    letter-spacing: .01em;
+  }
+
+  /* ── MODALITY STRIP ─────────────────────── */
+  .modality-strip {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 32px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .modality-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .modality-sep {
+    width: 1px;
+    height: 40px;
+    background: var(--border);
+    margin: 0 24px;
+    flex-shrink: 0;
+  }
+
+  .mod-info-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mod-info-icon svg { width: 18px; height: 18px; }
+
+  .modality-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .modality-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    letter-spacing: -.01em;
+  }
+
+  /* ── RESPONSIVE ADDITIONS ───────────────── */
+  @media (max-width: 900px) {
+    .obj-block { padding: 20px; }
+    .compromiso-block { padding: 24px; }
+    .compromisos-grid { grid-template-columns: 1fr; }
+    .modality-strip { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px 24px; }
+    .modality-sep { display: none; }
+    .modality-item { width: 100%; }
+  }
+
+  /* ── SCROLL REVEAL ──────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: .08s; }
+  .reveal-delay-2 { transition-delay: .16s; }
+  .reveal-delay-3 { transition-delay: .24s; }
+  .reveal-delay-4 { transition-delay: .32s; }
+
+  /* ── LM CONSULTORES SECTION ─────────────── */
+  .lm-hero {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 32px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 40px;
+    margin-bottom: 24px;
+    align-items: center;
+  }
+
+  .lm-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 14px;
+  }
+
+  .lm-hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 3.5vw, 38px);
+    line-height: 1.1;
+    color: var(--navy);
+    margin-bottom: 16px;
+    letter-spacing: -.02em;
+  }
+
+  .lm-hero-title em {
+    font-style: italic;
+    color: var(--blue);
+  }
+
+  .lm-hero-sub {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 20px;
+    letter-spacing: .01em;
+  }
+
+  .lm-hero-sub strong {
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .lm-brand-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .lm-pill {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--ice);
+    color: var(--mid);
+    border: 1px solid var(--border);
+  }
+
+  .lm-client-card {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .lm-client-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .lm-client-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 4px;
+  }
+
+  .lm-client-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+    letter-spacing: -.01em;
+  }
+
+  .lm-client-msg {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: .01em;
+  }
+
+  /* Objetivo */
+  .lm-objetivo {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .lm-obj-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--ice);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--blue);
+  }
+
+  .lm-obj-icon svg { width: 24px; height: 24px; }
+
+  .lm-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+
+  .lm-obj-text {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--muted);
+    letter-spacing: .01em;
+  }
+
+  /* Contenido grid */
+  .lm-content-section {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .lm-content-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .lm-content-card {
+    background: var(--pale);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 18px;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+
+  .lm-content-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0,120,212,0.09);
+    border-color: rgba(0,120,212,0.28);
+  }
+
+  .lm-cc-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .lm-cc-icon svg { width: 20px; height: 20px; }
+
+  .lm-cc-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 8px;
+    line-height: 1.3;
+    letter-spacing: -.01em;
+  }
+
+  .lm-cc-desc {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--muted);
+    letter-spacing: .01em;
+  }
+
+  /* Info row */
+  .lm-info-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .lm-info-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .lm-info-card:hover {
+    border-color: rgba(0,120,212,0.3);
+    box-shadow: 0 4px 16px rgba(0,120,212,0.07);
+  }
+
+  .lm-info-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--ice);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--blue);
+  }
+
+  .lm-info-icon svg { width: 20px; height: 20px; }
+
+  .lm-info-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .lm-info-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    letter-spacing: -.01em;
+  }
+
+  /* Compromiso */
+  .lm-compromiso {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .lm-compromisos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .lm-comp-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--pale);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .lm-comp-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--green);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .lm-comp-item span {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.55;
+    letter-spacing: .01em;
+  }
+
+  /* CTA LM */
+  .lm-cta {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .lm-cta-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .lm-cta-body { flex: 1; min-width: 200px; }
+
+  .lm-cta-main {
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: .01em;
+    margin-bottom: 4px;
+  }
+
+  .lm-cta-sub {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: -.01em;
+  }
+
+  .lm-cta-sub strong { color: var(--sky); }
+
+  /* ── RESPONSIVE LM ───────────────────────── */
+  @media (max-width: 900px) {
+    .lm-hero { grid-template-columns: 1fr; padding: 28px 24px; }
+    .lm-content-grid { grid-template-columns: 1fr 1fr; }
+    .lm-info-row { grid-template-columns: 1fr; }
+    .lm-compromisos-grid { grid-template-columns: 1fr; }
+    .lm-cta { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 560px) {
+    .lm-content-grid { grid-template-columns: 1fr; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ─────────────────────────── */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 32px; padding: 48px 24px 40px; }
+    .m365-panel { display: none; }
+    .main { padding: 40px 24px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .pitch { grid-template-columns: 1fr; }
+    .apps-grid { grid-template-columns: 1fr; }
+    .skills-layout { grid-template-columns: 1fr; }
+    .modules-timeline::before { display: none; }
+    .module-item { grid-template-columns: 1fr; }
+    .module-num { display: none; }
+    .footer-cta { padding: 40px 24px 0; }
+    .footer-cta-inner { padding-bottom: 40px; }
     .contact-strip {
-      position: relative;
-      z-index: 2;
-      border-top: 1px solid rgba(255,255,255,0.07);
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 44px 48px;
-      display: grid;
-      grid-template-columns: 1fr 1px 1fr;
-      align-items: center;
+      grid-template-columns: 1fr;
+      padding: 32px 24px;
+      gap: 28px;
     }
-
-    .contact-divider {
-      background: rgba(255,255,255,0.08);
-      height: 56px;
-      align-self: center;
-      margin: 0 48px;
-    }
-
-    .contact-card {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      text-align: left;
-    }
-
-    .contact-card-icon {
-      width: 50px; height: 50px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: transform 0.3s var(--ease-spring), border-color 0.3s;
-    }
-    .contact-card:hover .contact-card-icon { transform: scale(1.08); border-color: rgba(255,255,255,0.2); }
-    .contact-card-icon i { font-size: 22px; }
-
-    .cc-role {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--sky);
-      margin-bottom: 4px;
-    }
-
-    .cc-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.92);
-      margin-bottom: 6px;
-      letter-spacing: -.01em;
-    }
-
-    .cc-links {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .cc-link {
-      font-size: 12px;
-      color: rgba(255,255,255,0.36);
-      font-weight: 400;
-      text-decoration: none;
-      transition: color 0.15s;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
-    }
-    .cc-link:hover { color: var(--sky); }
-    .cc-link i { font-size: 13px; opacity: 0.7; }
-
-    .cc-link-sep {
-      width: 3px; height: 3px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      display: inline-block;
-      flex-shrink: 0;
-    }
-
-    /* ── FOOTER BAR ──────────────────────────────── */
+    .contact-divider { display: none; }
+    .contact-card { align-items: flex-start; }
+    .contact-card-body .cc-name { white-space: normal; }
     .footer-bar {
-      position: relative;
-      z-index: 2;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      padding: 18px 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      padding: 16px 24px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
     }
-
-    .footer-bar-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-shrink: 0;
-    }
-
-    .footer-gh-link {
-      font-size: 11px;
-      color: rgba(255,255,255,0.28);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: color 0.15s;
-      font-weight: 500;
-    }
-    .footer-gh-link:hover { color: rgba(255,255,255,0.6); }
-    .footer-gh-link i { font-size: 15px; }
-    .footer-bar p { font-size: 11px; color: rgba(255,255,255,0.24); }
-
-    /* ── KEYFRAMES LIBRARY ────────────────────────── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
-
-    /* tab content entrance */
-    .section.active > * {
-      animation: fadeUp 0.42s var(--ease-out) both;
-    }
-    .section.active > *:nth-child(1) { animation-delay: 0s; }
-    .section.active > *:nth-child(2) { animation-delay: 0.06s; }
-    .section.active > *:nth-child(3) { animation-delay: 0.12s; }
-    .section.active > *:nth-child(4) { animation-delay: 0.18s; }
-
-    /* ── RESPONSIVE ──────────────────────────────── */
-    @media (max-width: 960px) {
-      .hero-inner {
-        grid-template-columns: 1fr;
-        gap: 36px;
-        padding: 52px 28px 44px;
-      }
-      .m365-panel { animation: none; }
-      .main { padding: 44px 28px; }
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .pitch { grid-template-columns: 1fr; }
-      .apps-grid { grid-template-columns: repeat(2, 1fr); }
-      .skills-layout { grid-template-columns: 1fr; }
-      .modules-timeline::before { display: none; }
-      .module-item { grid-template-columns: 1fr; }
-      .module-num { display: none; }
-      .footer-cta { padding: 48px 28px 0; }
-      .footer-cta-inner { padding-bottom: 48px; }
-      .contact-strip { grid-template-columns: 1fr; padding: 36px 28px; gap: 32px; }
-      .contact-divider { display: none; }
-      .footer-bar { padding: 16px 28px; flex-direction: column; align-items: flex-start; gap: 8px; }
-      .nav-inner { overflow-x: auto; padding: 0 28px; scrollbar-width: none; }
-      .nav-inner::-webkit-scrollbar { display: none; }
-    }
-
-    @media (max-width: 640px) {
-      .hero-inner { padding: 40px 20px 36px; }
-      .hero-title { font-size: clamp(30px, 8vw, 42px); }
-      .hero-subtitle { font-size: 14px; }
-      .m365-apps { grid-template-columns: repeat(4, 1fr); }
-      .main { padding: 36px 20px; }
-      .stats-row { gap: 12px; }
-      .stat-n { font-size: 40px; }
-      .apps-grid { grid-template-columns: 1fr; }
-      .section-head h2 { font-size: 26px; }
-      .footer-cta { padding: 40px 20px 0; }
-      .contact-strip { padding: 28px 20px; }
-      .footer-bar { padding: 14px 20px; }
-      .nav-inner { padding: 0 20px; }
-      .cta-btns { flex-direction: column; align-items: center; }
-      .cta-btns > * { width: 100%; justify-content: center; }
-    }
-
-    @media (max-width: 480px) {
-      .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .hero-badges { gap: 6px; }
-      .hbadge { font-size: 10px; padding: 5px 10px; }
-      .pitch-card { padding: 20px; }
-      .skills-layout { min-height: auto; }
-      .module-body { padding: 18px 20px; }
-    }
-
-    /* ── ACCESSIBLE FOCUS ────────────────────────── */
-    :focus-visible {
-      outline: 2px solid var(--blue);
-      outline-offset: 3px;
-      border-radius: 4px;
-    }
-
-    /* scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(0,120,212,0.25); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(0,120,212,0.45); }
-  </style>
+    .nav-inner { overflow-x: auto; padding: 0 24px; }
+  }
+</style>
 </head>
-
 <body>
 
-  <!-- Scroll progress -->
-  <div id="scroll-progress"></div>
-
-  <!-- ── HERO ───────────────────────────────────────────────── -->
-  <section class="hero">
-    <canvas id="hero-canvas"></canvas>
-    <div class="hero-grid"></div>
-    <div class="hero-glow"></div>
-    <div class="hero-glow2"></div>
-    <div class="hero-inner">
-      <div class="hero-left">
-        <div class="hero-eyebrow">
-          <i class="bi bi-stars" style="font-size:14px"></i>
-          Programa de formación profesional 2026
+<!-- ── HERO ──────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Programa de formación profesional 2026</div>
+      <h1 class="hero-title">IA para <em>Champions</em><br>Contables</h1>
+      <p class="hero-subtitle">Todo el poder de Microsoft 365 Copilot aplicado a la práctica contable, tributaria y financiera. Skills especializados. Agentes autónomos. Cero código.</p>
+      <div class="hero-badges">
+        <span class="hbadge blue">Microsoft 365 Copilot</span>
+        <span class="hbadge gold">5 Skills especializados</span>
+        <span class="hbadge white">Edición 2026</span>
+        <span class="hbadge white">40 horas · 4 módulos</span>
+      </div>
+    </div>
+    <div class="m365-panel">
+      <div class="m365-title">Apps M365 del programa</div>
+      <div class="m365-apps">
+        <div class="m365-app">
+          <div class="app-ico" style="background:#D83B01;color:#fff">W</div>
+          <div class="app-name">Word</div>
         </div>
-        <h1 class="hero-title">IA para <em>Champions</em><br>Contables</h1>
-        <p class="hero-subtitle">Todo el poder de Microsoft 365 Copilot aplicado a la práctica contable, tributaria y financiera. Skills especializados. Agentes autónomos. Cero código.</p>
-        <div class="hero-badges">
-          <span class="hbadge blue"><i class="bi bi-microsoft" style="font-size:11px"></i> Microsoft 365 Copilot</span>
-          <span class="hbadge gold"><i class="bi bi-lightning-charge-fill" style="font-size:11px"></i> 5 Skills especializados</span>
-          <span class="hbadge white"><i class="bi bi-calendar3" style="font-size:11px"></i> Edición 2026</span>
-          <span class="hbadge white"><i class="bi bi-clock" style="font-size:11px"></i> 40 h · 4 módulos</span>
+        <div class="m365-app">
+          <div class="app-ico" style="background:#217346;color:#fff">X</div>
+          <div class="app-name">Excel</div>
+        </div>
+        <div class="m365-app">
+          <div class="app-ico" style="background:#B7472A;color:#fff">P</div>
+          <div class="app-name">PowerPoint</div>
+        </div>
+        <div class="m365-app">
+          <div class="app-ico" style="background:#0078D4;color:#fff">T</div>
+          <div class="app-name">Teams</div>
+        </div>
+        <div class="m365-app">
+          <div class="app-ico" style="background:#0F6CBD;color:#fff">O</div>
+          <div class="app-name">Outlook</div>
+        </div>
+        <div class="m365-app">
+          <div class="app-ico" style="background:#742774;color:#fff">S</div>
+          <div class="app-name">SharePoint</div>
+        </div>
+        <div class="m365-app">
+          <div class="app-ico" style="background:#CC4A21;color:#fff">L</div>
+          <div class="app-name">Loop</div>
+        </div>
+        <div class="m365-app">
+          <div class="app-ico" style="background:#0F3A68;color:#fff">🤖</div>
+          <div class="app-name">Copilot Studio</div>
         </div>
       </div>
-      <div class="m365-panel-wrap">
-        <div class="m365-panel">
-          <div class="m365-title">Apps M365 del programa</div>
-          <div class="m365-apps">
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#D83B01,#FF6B35);color:#fff">W</div><div class="app-name">Word</div></div>
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#107C10,#21A121);color:#fff">X</div><div class="app-name">Excel</div></div>
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#B7472A,#E05A30);color:#fff">P</div><div class="app-name">PowerPoint</div></div>
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#4B53BC,#6264A7);color:#fff">T</div><div class="app-name">Teams</div></div>
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#0F6CBD,#0078D4);color:#fff">O</div><div class="app-name">Outlook</div></div>
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#742774,#9B2D9B);color:#fff">S</div><div class="app-name">SharePoint</div></div>
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#CC4A21,#E85E2F);color:#fff">L</div><div class="app-name">Loop</div></div>
-            <div class="m365-app"><div class="app-icon" style="background:linear-gradient(135deg,#0F3A68,#1A5EA8);color:#fff"><i class="bi bi-robot" style="font-size:15px"></i></div><div class="app-name">Copilot Studio</div></div>
-          </div>
-          <div class="copilot-badge">
-            <i class="bi bi-stars cb-icon"></i>
-            <div class="cb-text"><strong>Copilot integrado en cada app</strong> — un solo asistente IA que opera en todo tu ecosistema M365.</div>
+      <div class="copilot-badge">
+        <span class="cb-icon">✦</span>
+        <div class="cb-text"><strong>Copilot integrado en cada app</strong> — un solo asistente IA que opera en todo tu ecosistema M365.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NAV ──────────────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-tab active" onclick="showTab('overview',this)">Visión general</div>
+    <div class="nav-tab" onclick="showTab('apps',this)">Apps M365 + Copilot</div>
+    <div class="nav-tab" onclick="showTab('skills',this)">Skills contables</div>
+    <div class="nav-tab" onclick="showTab('modulos',this)">Módulos</div>
+  </div>
+</nav>
+
+<!-- ── MAIN ──────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="section active">
+
+    <div class="stats-row">
+      <div class="stat-card c-blue reveal">
+        <div class="stat-n">8</div>
+        <div class="stat-l">Apps M365<br>con Copilot</div>
+      </div>
+      <div class="stat-card c-gold reveal">
+        <div class="stat-n">5</div>
+        <div class="stat-l">Skills contables<br>especializados</div>
+      </div>
+      <div class="stat-card c-teal reveal">
+        <div class="stat-n">10h</div>
+        <div class="stat-l">Capacitación enfocada<br>Virtual y presencial</div>
+      </div>
+      <div class="stat-card c-green reveal">
+        <div class="stat-n">4</div>
+        <div class="stat-l">Ejes temáticos<br>de la formación</div>
+      </div>
+    </div>
+
+    <!-- Objetivo -->
+    <div class="obj-block reveal">
+      <div class="obj-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7a6.006 6.006 0 01-1.006 3.542c-.706-.981-1.26-2.09-1.642-3.27m3.648-.272a6 6 0 00-3.654.378"/></svg>
+      </div>
+      <div class="obj-body">
+        <div class="obj-label">Objetivo del programa</div>
+        <p class="obj-text">Fortalecer las competencias del equipo contable en el uso estratégico de herramientas de Inteligencia Artificial aplicadas a la auditoría y la contabilidad, promoviendo una cultura de organización, seguridad y gestión de riesgos para maximizar los beneficios y minimizar los riesgos asociados a su uso.</p>
+      </div>
+    </div>
+
+    <div class="pitch">
+      <div class="pitch-card reveal">
+        <h3><span style="font-size:18px">🎯</span> ¿Por qué IA en Contabilidad?</h3>
+        <p>Microsoft 365 Copilot ya está en tu ecosistema. Word, Excel, Teams, Outlook — herramientas que usas a diario. Este programa convierte la IA en tu asistente contable, aplicado a auditoría, impuestos y consultoría. Sin instalar nada nuevo. Sin saber programar.</p>
+      </div>
+      <div class="pitch-card reveal">
+        <h3><span style="font-size:18px">🏗️</span> Qué construirás</h3>
+        <ul>
+          <li>Skills tributarios que conocen la normativa DIAN por dentro</li>
+          <li>Agentes de conciliación automática en Copilot Studio</li>
+          <li>Informes ejecutivos generados en Word y PowerPoint con IA</li>
+          <li>Dashboards financieros con análisis narrativo en Excel</li>
+          <li>Flujos de aprobación y alertas tributarias en Teams</li>
+        </ul>
+      </div>
+      <div class="pitch-card reveal">
+        <h3><span style="font-size:18px">👤</span> Para quién</h3>
+        <ul>
+          <li>Todo el equipo de contabilidad, auditoría e impuestos</li>
+          <li>Seniors con 3+ años en tributación, auditoría o finanzas</li>
+          <li>Champions liderando la transformación IA en su área</li>
+          <li>Profesionales que quieren agregar valor analítico real</li>
+        </ul>
+      </div>
+      <div class="pitch-card reveal">
+        <h3><span style="font-size:18px">📦</span> Entregables</h3>
+        <ul>
+          <li>1 Skill Tributario personalizado y funcional</li>
+          <li>1 Agente contable desplegado en Teams</li>
+          <li>1 Flujo automatizado de informes mensuales</li>
+          <li>Biblioteca de prompts contables para M365</li>
+          <li>Manual de adopción de Copilot para el área</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Nuestro compromiso -->
+    <div class="compromiso-block reveal">
+      <div class="compromiso-head">
+        <div class="comp-eyebrow">Nuestro compromiso</div>
+        <h3 class="comp-title">Lo que garantizamos en cada capacitación</h3>
+      </div>
+      <div class="compromisos-grid">
+        <div class="comp-item reveal">
+          <div class="comp-check">✓</div>
+          <div class="comp-body">
+            <div class="comp-name">100% práctico</div>
+            <p class="comp-desc">Contenido aplicado a la realidad del equipo contable, con casos reales de auditoría y contabilidad desde el primer día.</p>
           </div>
         </div>
+        <div class="comp-item reveal">
+          <div class="comp-check">✓</div>
+          <div class="comp-body">
+            <div class="comp-name">Facilitadores especializados</div>
+            <p class="comp-desc">Expertos con experiencia combinada en IA y sector contable — no teoría genérica, sino dominio del área.</p>
+          </div>
+        </div>
+        <div class="comp-item reveal">
+          <div class="comp-check">✓</div>
+          <div class="comp-body">
+            <div class="comp-name">Acompañamiento continuo</div>
+            <p class="comp-desc">Presencia antes, durante y después de la capacitación para garantizar la adopción real en los procesos del equipo.</p>
+          </div>
+        </div>
+        <div class="comp-item reveal">
+          <div class="comp-check">✓</div>
+          <div class="comp-body">
+            <div class="comp-name">Material y certificación</div>
+            <p class="comp-desc">Guías prácticas, biblioteca de prompts contables y certificado de participación para cada integrante del equipo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- APPS M365 -->
+  <section id="apps" class="section">
+    <div class="section-head">
+      <h2>Microsoft 365 Copilot en cada app</h2>
+      <p>Cada aplicación del ecosistema M365 tiene Copilot integrado. El programa enseña a aplicarlo en auditoría, contabilidad e impuestos — con casos concretos de análisis inteligente, organización de equipos, seguridad y toma de decisiones.</p>
+    </div>
+
+    <div class="apps-grid" id="apps-grid">
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="section">
+    <div class="section-head">
+      <h2>Skills contables especializados</h2>
+      <p>Los Skills transforman a Copilot en un experto de dominio contable. Cubren los cuatro ejes de la capacitación — uso de IA, organización de equipos, seguridad y casos prácticos — activándose desde cualquier app del ecosistema M365.</p>
+    </div>
+
+    <div class="skills-layout">
+      <div class="skills-sidebar" id="skills-sidebar"></div>
+      <div class="skill-detail-panel" id="skill-detail-panel">
+        <p style="color:var(--muted);font-size:14px;text-align:center;margin-top:60px">← Selecciona un Skill para ver su detalle</p>
       </div>
     </div>
   </section>
 
-  <!-- ── NAV ────────────────────────────────────────────────── -->
-  <nav class="nav" id="main-nav">
-    <div class="nav-inner">
-      <div class="nav-tab active" onclick="showTab('overview',this)"><i class="bi bi-grid-1x2"></i> Visión general</div>
-      <div class="nav-tab" onclick="showTab('apps',this)"><i class="bi bi-app-indicator"></i> Apps M365 + Copilot</div>
-      <div class="nav-tab" onclick="showTab('skills',this)"><i class="bi bi-lightning-charge"></i> Skills contables</div>
-      <div class="nav-tab" onclick="showTab('modulos',this)"><i class="bi bi-journals"></i> Módulos</div>
-    </div>
-  </nav>
-
-  <!-- ── MAIN ───────────────────────────────────────────────── -->
-  <main class="main">
-
-    <!-- OVERVIEW -->
-    <section id="overview" class="section active">
-      <div class="stats-row reveal-stagger">
-        <div class="stat-card c-blue">
-          <div class="stat-n" data-count="8">8</div>
-          <div class="stat-l">Apps M365<br>con Copilot</div>
-        </div>
-        <div class="stat-card c-gold">
-          <div class="stat-n" data-count="5">5</div>
-          <div class="stat-l">Skills contables<br>especializados</div>
-        </div>
-        <div class="stat-card c-teal">
-          <div class="stat-n">40h</div>
-          <div class="stat-l">Programa completo<br>4 módulos</div>
-        </div>
-        <div class="stat-card c-green">
-          <div class="stat-n" data-count="4">4</div>
-          <div class="stat-l">Roles IA<br>certificados</div>
-        </div>
-      </div>
-
-      <div class="pitch reveal-stagger">
-        <div class="pitch-card">
-          <h3><i class="bi bi-bullseye"></i> ¿Por qué M365 Copilot?</h3>
-          <p>Microsoft 365 Copilot ya está en tu ecosistema. Word, Excel, Teams, Outlook — herramientas que usas a diario. Este programa te enseña a convertir Copilot en tu asistente contable IA, sin instalar nada nuevo y sin saber programar.</p>
-        </div>
-        <div class="pitch-card">
-          <h3><i class="bi bi-building-gear"></i> Qué construirás</h3>
-          <ul>
-            <li><i class="bi bi-arrow-right-short"></i>Skills tributarios que conocen la normativa DIAN por dentro</li>
-            <li><i class="bi bi-arrow-right-short"></i>Agentes de conciliación automática en Copilot Studio</li>
-            <li><i class="bi bi-arrow-right-short"></i>Informes ejecutivos generados en Word y PowerPoint con IA</li>
-            <li><i class="bi bi-arrow-right-short"></i>Dashboards financieros con análisis narrativo en Excel</li>
-            <li><i class="bi bi-arrow-right-short"></i>Flujos de aprobación y alertas tributarias en Teams</li>
-          </ul>
-        </div>
-        <div class="pitch-card">
-          <h3><i class="bi bi-person-check"></i> Para quién</h3>
-          <ul>
-            <li><i class="bi bi-arrow-right-short"></i>Champions contables liderando transformación IA en su área</li>
-            <li><i class="bi bi-arrow-right-short"></i>Seniors con 3+ años en tributación, auditoría o finanzas</li>
-            <li><i class="bi bi-arrow-right-short"></i>Equipos con licencia M365 Business Standard o superior</li>
-            <li><i class="bi bi-arrow-right-short"></i>Profesionales que quieren agregar valor analítico real</li>
-          </ul>
-        </div>
-        <div class="pitch-card">
-          <h3><i class="bi bi-box-seam"></i> Entregables</h3>
-          <ul>
-            <li><i class="bi bi-arrow-right-short"></i>1 Skill Tributario personalizado y funcional</li>
-            <li><i class="bi bi-arrow-right-short"></i>1 Agente contable desplegado en Teams</li>
-            <li><i class="bi bi-arrow-right-short"></i>1 Flujo automatizado de informes mensuales</li>
-            <li><i class="bi bi-arrow-right-short"></i>Biblioteca de prompts contables para M365</li>
-            <li><i class="bi bi-arrow-right-short"></i>Manual de adopción de Copilot para el área</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- APPS M365 -->
-    <section id="apps" class="section">
-      <div class="section-head reveal">
-        <h2>Microsoft 365 Copilot en cada app</h2>
-        <p>Cada aplicación del ecosistema M365 tiene Copilot integrado. El programa te enseña a usar Copilot específicamente en cada una para tareas contables y financieras concretas.</p>
-      </div>
-      <div class="apps-grid reveal-stagger" id="apps-grid"></div>
-    </section>
-
-    <!-- SKILLS -->
-    <section id="skills" class="section">
-      <div class="section-head reveal">
-        <h2>Skills contables especializados</h2>
-        <p>Los Skills son módulos de instrucción que transforman a Copilot en un experto de dominio. Construidos sobre M365, se activan desde cualquier app del ecosistema.</p>
-      </div>
-      <div class="skills-layout">
-        <div class="skills-sidebar reveal" id="skills-sidebar"></div>
-        <div class="skill-detail-panel reveal" id="skill-detail-panel">
-          <p style="color:var(--muted);font-size:14px;text-align:center;margin-top:60px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="bi bi-arrow-left-circle" style="font-size:18px;color:var(--blue)"></i> Selecciona un Skill para ver su detalle</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- MÓDULOS -->
-    <section id="modulos" class="section">
-      <div class="section-head reveal">
-        <h2>Estructura del programa</h2>
-        <p>40 horas académicas en 4 módulos progresivos. De los fundamentos de Copilot hasta el despliegue de agentes contables autónomos en producción.</p>
-      </div>
-      <div class="modules-timeline reveal-stagger" id="modules-timeline"></div>
-    </section>
-
-  </main>
-
-  <!-- ── FOOTER CTA ──────────────────────────────────────────── -->
-  <div class="footer-cta">
-    <div class="footer-cta-inner">
-      <h2>El contador que domina <em>Copilot</em><br>no compite con la IA — la lidera.</h2>
-      <p>Microsoft 365 Copilot ya está en tu ecosistema. Solo falta saber usarlo como un arquitecto contable.</p>
-      <div class="cta-btns">
-        <button class="btn-main" onclick="showTab('modulos', document.querySelectorAll('.nav-tab')[3])">
-          <i class="bi bi-journals"></i> Ver programa completo
-        </button>
-        <button class="btn-ghost" onclick="showTab('skills', document.querySelectorAll('.nav-tab')[2])">
-          <i class="bi bi-lightning-charge"></i> Explorar Skills
-        </button>
-        <a href="https://wa.me/573133862267?text=Hola%2C%20estoy%20interesado%20en%20cotizar%20el%20programa%20IA%20para%20Champions%20Contables%20%E2%80%94%20Microsoft%20365%20Copilot." target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Cotizar por WhatsApp
-        </a>
-      </div>
+  <!-- MÓDULOS -->
+  <section id="modulos" class="section">
+    <div class="section-head">
+      <h2>Estructura del programa</h2>
+      <p>Cuatro módulos progresivos que llevan al equipo desde los fundamentos de Copilot hasta el despliegue de agentes contables autónomos en producción.</p>
     </div>
 
-    <!-- Contact strip -->
-    <div class="contact-strip">
-      <div class="contact-card">
-        <div class="contact-card-icon" style="background:rgba(0,120,212,0.12)">
-          <i class="bi bi-briefcase" style="font-size:22px;color:rgba(80,180,240,0.85)"></i>
+    <!-- Modalidad strip -->
+    <div class="modality-strip reveal">
+      <div class="modality-item">
+        <div class="mod-info-icon" style="background:rgba(0,120,212,0.1);color:var(--blue)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"/></svg>
         </div>
-        <div class="contact-card-body">
-          <div class="cc-role">Consultor Financiero</div>
-          <div class="cc-name">Carlos Pinzón — Consultoría SCA</div>
-          <div class="cc-links">
-            <a href="mailto:cpinzon@consultoriasca.com" class="cc-link">
-              <i class="bi bi-envelope"></i> cpinzon@consultoriasca.com
-            </a>
-          </div>
+        <div>
+          <div class="modality-label">Modalidad</div>
+          <div class="modality-val">Virtual y presencial</div>
         </div>
       </div>
-
-      <div class="contact-divider"></div>
-
-      <div class="contact-card">
-        <div class="contact-card-icon" style="background:rgba(0,180,200,0.10)">
-          <i class="bi bi-code-slash" style="font-size:22px;color:rgba(0,180,200,0.85)"></i>
+      <div class="modality-sep"></div>
+      <div class="modality-item">
+        <div class="mod-info-icon" style="background:rgba(0,180,200,0.1);color:var(--teal)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <div class="contact-card-body">
-          <div class="cc-role">Desarrollo &amp; Arquitectura Web</div>
-          <div class="cc-name">Rubén Araujo Carpio</div>
-          <div class="cc-links">
-            <a href="mailto:araujocarpio@gmail.com" class="cc-link">
-              <i class="bi bi-envelope"></i> araujocarpio@gmail.com
-            </a>
-            <span class="cc-link-sep"></span>
-            <a href="https://github.com/araujocarpio" target="_blank" rel="noopener noreferrer" class="cc-link">
-              <i class="bi bi-github"></i> github.com/araujocarpio
-            </a>
-          </div>
+        <div>
+          <div class="modality-label">Duración</div>
+          <div class="modality-val">Máximo 10 horas totales</div>
+        </div>
+      </div>
+      <div class="modality-sep"></div>
+      <div class="modality-item">
+        <div class="mod-info-icon" style="background:rgba(16,124,16,0.1);color:var(--green)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+        </div>
+        <div>
+          <div class="modality-label">Dirigido a</div>
+          <div class="modality-val">Todo el equipo contable</div>
+        </div>
+      </div>
+      <div class="modality-sep"></div>
+      <div class="modality-item">
+        <div class="mod-info-icon" style="background:rgba(255,185,0,0.1);color:var(--gold)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+        </div>
+        <div>
+          <div class="modality-label">Acceso</div>
+          <div class="modality-val">M365 Business Standard+</div>
         </div>
       </div>
     </div>
 
-    <!-- Footer bar -->
-    <div class="footer-bar">
-      <div class="footer-bar-left">
-        <p>© 2026 Consultoría SCA · Programa IA para Champions Contables · Todos los derechos reservados</p>
-      </div>
-      <div class="footer-bar-right">
-        <a href="https://github.com/araujocarpio" target="_blank" rel="noopener noreferrer" class="footer-gh-link">
-          <i class="bi bi-github"></i> Ver en GitHub
-        </a>
-      </div>
+    <div class="modules-timeline" id="modules-timeline"></div>
+  </section>
+
+</main>
+
+<!-- ── FOOTER CTA ─────────────────────────────────────────────── -->
+<div class="footer-cta">
+  <div class="footer-cta-inner">
+    <h2>Listos para ser su <em>aliado estratégico</em><br>en la era de la IA.</h2>
+    <p>Contabilidad, auditoría, impuestos, consultoría — potenciados con Inteligencia Artificial. Contemos juntos lo que viene.</p>
+    <div class="cta-btns">
+      <button class="btn-main" onclick="showTab('modulos', document.querySelectorAll('.nav-tab')[3])">Ver programa completo →</button>
+      <button class="btn-ghost" onclick="showTab('skills', document.querySelectorAll('.nav-tab')[2])">Explorar Skills →</button>
+      <a
+        href="https://wa.me/573133862267?text=Hola%2C%20estoy%20interesado%20en%20cotizar%20el%20programa%20IA%20para%20Champions%20Contables%20%E2%80%94%20Microsoft%20365%20Copilot."
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-whatsapp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Cotizar por WhatsApp
+      </a>
     </div>
   </div>
 
-  <script>
-    // ── DATA ─────────────────────────────────────────────────────
-    const APPS = [
-      { name:"Copilot en Excel", sub:"Análisis financiero inteligente", icon:"X", iconBg:"linear-gradient(135deg,#107C10,#21A121)", desc:"Copilot en Excel transforma tablas de datos en análisis narrativos. Genera ratios, detecta anomalías y produce interpretaciones ejecutivas de estados financieros.", tags:["Análisis Financiero","Ratios","EBITDA"], uses:["Analiza el estado de resultados y genera un resumen ejecutivo con variaciones","Crea fórmulas de ratios de liquidez y explica su interpretación","Detecta outliers en el libro mayor y señala cuentas fuera de rango","Genera gráficos de tendencia con narrativa automática para gerencia"], copilot:"Copilot en Excel" },
-      { name:"Copilot en Word", sub:"Redacción de informes contables", icon:"W", iconBg:"linear-gradient(135deg,#D83B01,#FF6B35)", desc:"Convierte datos y tablas en informes profesionales. Genera borradores de memorandos, informes de auditoría, cartas tributarias y reportes de gestión en segundos.", tags:["Reportería Ejecutiva","Auditoría","NIIF"], uses:["Redacta el informe de cierre mensual basado en el resumen financiero adjunto","Genera un borrador de respuesta a requerimiento DIAN con tono formal","Crea la nota explicativa de variaciones para los estados financieros","Convierte la tabla de conciliación en narrativa para junta directiva"], copilot:"Copilot en Word" },
-      { name:"Copilot en Teams", sub:"Asistente en reuniones financieras", icon:"T", iconBg:"linear-gradient(135deg,#4B53BC,#6264A7)", desc:"Copilot en Teams transcribe reuniones de comité financiero, genera actas automáticas, resume decisiones y asigna tareas pendientes al equipo contable.", tags:["Creador de Agentes","Reuniones","Seguimiento"], uses:["Transcribe el comité de cierre y genera acta con acuerdos y responsables","Resume los puntos clave de la reunión con el auditor externo","Lista los pendientes tributarios acordados con fechas de entrega","Responde preguntas sobre el historial de decisiones del área"], copilot:"Copilot en Teams" },
-      { name:"Copilot en Outlook", sub:"Gestión de comunicaciones tributarias", icon:"O", iconBg:"linear-gradient(135deg,#0F6CBD,#0078D4)", desc:"Redacta respuestas a clientes, proveedores y entes de control. Resume cadenas largas de emails tributarios y prioriza comunicaciones urgentes del área.", tags:["Skill Tributario","Comunicación","DIAN"], uses:["Redacta respuesta formal al requerimiento DIAN adjunto en el email","Resume la cadena de correos con el cliente sobre el cierre fiscal","Prioriza los correos pendientes de proveedores con deuda en cartera","Genera borrador de notificación de vencimiento tributario a clientes"], copilot:"Copilot en Outlook" },
-      { name:"Copilot en PowerPoint", sub:"Presentaciones de resultados", icon:"P", iconBg:"linear-gradient(135deg,#B7472A,#E05A30)", desc:"Transforma los datos del cierre en presentaciones ejecutivas listas para junta directiva. Genera slides con narrativa financiera, gráficos y conclusiones accionables.", tags:["Reportería Ejecutiva","Análisis Financiero"], uses:["Crea presentación de resultados Q2 basada en el Excel de estados financieros","Genera slide de variaciones vs presupuesto con análisis de causas","Diseña la presentación de cumplimiento tributario anual para socios","Produce el deck de gestión de riesgos contables para auditoría"], copilot:"Copilot en PowerPoint" },
-      { name:"Copilot Studio", sub:"Constructor de Agentes Contables", icon:"<i class='bi bi-robot' style='font-size:18px'></i>", iconBg:"linear-gradient(135deg,#0F3A68,#1A5EA8)", desc:"La herramienta sin código de Microsoft para construir agentes IA personalizados. Diseña agentes de conciliación, tributarios y de alertas que viven en Teams o la web.", tags:["Creador de Agentes","Automatización"], uses:["Crea el agente de conciliación bancaria que compara movimientos vs contabilidad","Diseña el bot de alertas tributarias que notifica vencimientos en Teams","Construye el asistente de consultas NIIF para el equipo contable","Despliega el agente de aprobación de facturas con flujo de revisión"], copilot:"Copilot Studio" },
-      { name:"Copilot en SharePoint", sub:"Base de conocimiento contable", icon:"S", iconBg:"linear-gradient(135deg,#742774,#9B2D9B)", desc:"Conecta Copilot a tu base documental: normativas, políticas contables, contratos y soportes. Copilot responde preguntas sobre tus documentos internos con precisión.", tags:["Técnico Contable","NIIF","Normativa"], uses:["¿Cuál es la política de reconocimiento de ingresos según nuestros documentos?","Resume los cambios de NIIF del trimestre en nuestros archivos de actualización","Encuentra todos los soportes de la declaración de renta 2024 indexados aquí","¿Qué dice nuestra política sobre capitalización de activos intangibles?"], copilot:"Copilot en SharePoint" },
-      { name:"Microsoft Loop", sub:"Colaboración contable en tiempo real", icon:"L", iconBg:"linear-gradient(135deg,#CC4A21,#E85E2F)", desc:"Copilot en Loop permite co-crear documentos financieros en tiempo real con el equipo. Ideal para cierres colaborativos, revisiones de auditoría y documentación de procesos.", tags:["Reportería Ejecutiva","Técnico Contable"], uses:["Genera el template de cierre mensual con secciones para cada área","Crea el checklist de auditoría interna con asignación de responsables","Produce la agenda del comité de cierre con puntos automáticos del mes","Resume los avances del equipo en el proceso de cierre trimestral"], copilot:"Copilot en Loop" }
-    ];
+  <!-- Contact strip -->
+  <div class="contact-strip">
 
-    const SKILLS = [
-      { icon:"<i class='bi bi-file-earmark-text' style='font-size:20px;color:#DC2626'></i>", iconBg:"#FEE2E2", accentColor:"#DC2626", name:"Skill Tributario", level:"Avanzado", levelBg:"#FEE2E2", levelColor:"#DC2626", desc:"Convierte a Copilot en un experto tributario que conoce la normativa DIAN, IVA, retenciones, renta y declaraciones. Responde consultas, revisa borradores y genera alertas con base en normativa vigente.", apps:[{name:"Copilot en Outlook",color:"#0F6CBD"},{name:"Copilot en Word",color:"#D83B01"},{name:"SharePoint",color:"#742774"}], prompts:[{label:"Consulta normativa",text:"Revisa este borrador de declaración de retenciones y señala cualquier inconsistencia con la normativa DIAN vigente."},{label:"Alerta de vencimiento",text:"Con base en el calendario tributario adjunto, lista las obligaciones que vencen en los próximos 15 días y clasifícalas por urgencia."},{label:"Respuesta a requerimiento",text:"Redacta una respuesta formal al requerimiento ordinario DIAN adjunto, usando tono técnico-jurídico y argumentando desde normativa."}] },
-      { icon:"<i class='bi bi-graph-up-arrow' style='font-size:20px;color:#1D4ED8'></i>", iconBg:"#DBEAFE", accentColor:"#1D4ED8", name:"Skill Análisis Financiero", level:"Avanzado", levelBg:"#DBEAFE", levelColor:"#1D4ED8", desc:"Motor de análisis de estados financieros integrado en Excel y Word. Calcula ratios, EBITDA, flujo de caja libre, genera narrativas para junta directiva y alerta desviaciones presupuestales.", apps:[{name:"Copilot en Excel",color:"#217346"},{name:"Copilot en PowerPoint",color:"#B7472A"},{name:"Copilot en Word",color:"#D83B01"}], prompts:[{label:"Análisis de ratios",text:"Calcula los ratios de liquidez, rentabilidad y endeudamiento con los datos del balance adjunto e interpreta cada uno en lenguaje ejecutivo."},{label:"Narrativa para junta",text:"Redacta el análisis de resultados del trimestre comparado con el período anterior, destacando las 3 variaciones más relevantes y sus causas."},{label:"Alerta presupuestal",text:"Compara el P&L real vs presupuesto y señala las líneas con desviación superior al 10%, con posibles causas y recomendaciones."}] },
-      { icon:"<i class='bi bi-search' style='font-size:20px;color:#7C3AED'></i>", iconBg:"#EDE9FE", accentColor:"#7C3AED", name:"Skill Técnico Contable", level:"Avanzado", levelBg:"#EDE9FE", levelColor:"#7C3AED", desc:"Valida asientos, detecta inconsistencias en el libro mayor, revisa conciliaciones bancarias, analiza partidas abiertas y apoya auditoría interna con razonamiento contable estructurado.", apps:[{name:"Copilot en Excel",color:"#217346"},{name:"Copilot en SharePoint",color:"#742774"},{name:"Copilot en Word",color:"#D83B01"}], prompts:[{label:"Revisión de asientos",text:"Analiza la relación de asientos del mes y señala los que tienen descripción incompleta, cuentas inusuales o montos fuera del rango histórico."},{label:"Conciliación bancaria",text:"Compara el extracto bancario adjunto con el auxiliar contable e identifica las partidas en tránsito, errores y movimientos sin cruzar."},{label:"Auditoría interna",text:"Revisa esta muestra de 20 facturas y verifica que cumplan con los requisitos de soporte según NIIF y política interna de la compañía."}] },
-      { icon:"<i class='bi bi-robot' style='font-size:20px;color:#065F46'></i>", iconBg:"#D1FAE5", accentColor:"#065F46", name:"Skill Creador de Agentes", level:"Experto", levelBg:"#D1FAE5", levelColor:"#065F46", desc:"Metodología para diseñar y desplegar agentes contables en Copilot Studio. Incluye lógica de decisión, integración con datos de SharePoint, despliegue en Teams y gestión de errores.", apps:[{name:"Copilot Studio",color:"#0F3A68"},{name:"Teams",color:"#4B53BC"},{name:"SharePoint",color:"#742774"}], prompts:[{label:"Diseño del agente",text:"Diseña la arquitectura del agente de conciliación: flujo de preguntas, fuentes de datos, condiciones de éxito y mensajes de error para el usuario."},{label:"Instrucciones base",text:"Escribe el system prompt del agente tributario que debe responder consultas DIAN usando solo los documentos cargados en SharePoint."},{label:"Prueba de calidad",text:"Genera 10 casos de prueba para el agente de alertas tributarias, incluyendo casos límite y situaciones de error que debe manejar correctamente."}] },
-      { icon:"<i class='bi bi-bar-chart-line' style='font-size:20px;color:#92400E'></i>", iconBg:"#FEF3C7", accentColor:"#92400E", name:"Skill Reportería Ejecutiva", level:"Intermedio", levelBg:"#FEF3C7", levelColor:"#92400E", desc:"Genera informes ejecutivos automáticos: cierres mensuales, presentaciones para socios y dashboards narrativos. Transforma datos crudos en lenguaje de negocio comprensible para no contadores.", apps:[{name:"Copilot en PowerPoint",color:"#B7472A"},{name:"Copilot en Word",color:"#D83B01"},{name:"Copilot en Loop",color:"#CC4A21"}], prompts:[{label:"Informe de cierre",text:"Con el resumen financiero adjunto, redacta el informe ejecutivo del mes para la gerencia general: máximo 1 página, sin tecnicismos contables."},{label:"Presentación de resultados",text:"Crea la estructura de la presentación de resultados semestrales: 8 slides con títulos, puntos clave y el mensaje principal de cada una."},{label:"Resumen para socios",text:"Resume el estado financiero del trimestre en 5 puntos ejecutivos: lo que fue bien, lo que preocupa, y la recomendación principal para Q+1."}] }
-    ];
+    <!-- Consultor Financiero -->
+    <div class="contact-card">
+      <div class="contact-card-icon" style="background:rgba(0,120,212,0.12)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="rgba(80,180,240,0.8)" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.073a2.25 2.25 0 01-2.25 2.25h-12a2.25 2.25 0 01-2.25-2.25V6a2.25 2.25 0 012.25-2.25h4.5M16.5 3.75h3.75M16.5 3.75v3.75M16.5 3.75l-6 6"/>
+        </svg>
+      </div>
+      <div class="contact-card-body">
+        <div class="cc-role">Consultor Financiero</div>
+        <div class="cc-name">Carlos Pinzón — Consultoría SCA</div>
+        <div class="cc-links">
+          <a href="mailto:cpinzon@consultoriasca.com" class="cc-link">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+            cpinzon@consultoriasca.com
+          </a>
+        </div>
+      </div>
+    </div>
 
-    const MODULES = [
-      { num:"I", color:"#0078D4", name:"Fundamentos: Copilot para Contadores", hrs:"10 horas", desc:"Comprende cómo funciona Copilot, qué puede y no puede hacer en contabilidad, y domina la técnica de prompting aplicada a casos financieros reales.", topics:["Cómo funciona Copilot","Prompt engineering contable","Copilot en Excel básico","Copilot en Word y Outlook","Ética IA y validación de salidas"], apps:[{name:"Excel",color:"#217346"},{name:"Word",color:"#D83B01"},{name:"Outlook",color:"#0F6CBD"}] },
-      { num:"II", color:"#7C3AED", name:"Construcción de Skills Especializados", hrs:"12 horas", desc:"Diseña y calibra los 5 Skills del programa: Tributario, Análisis Financiero, Técnico Contable, Creador de Agentes y Reportería. Cada uno sobre el ecosistema M365.", topics:["Anatomía de un Skill","Skill Tributario + DIAN","Skill de Análisis Financiero","Skill Técnico Contable","Testing y refinado con casos reales"], apps:[{name:"SharePoint",color:"#742774"},{name:"Excel",color:"#217346"},{name:"Word",color:"#D83B01"}] },
-      { num:"III", color:"#065F46", name:"Agentes Contables en Copilot Studio", hrs:"12 horas", desc:"Diseña y despliega agentes autónomos sin código en Copilot Studio: el agente conciliador, el bot de alertas tributarias y el asistente NIIF del equipo.", topics:["Arquitectura de agentes","Agente de conciliación bancaria","Bot de alertas tributarias","Asistente NIIF con SharePoint","Despliegue en Teams"], apps:[{name:"Copilot Studio",color:"#0F3A68"},{name:"Teams",color:"#4B53BC"},{name:"SharePoint",color:"#742774"}] },
-      { num:"IV", color:"#92400E", name:"Proyecto Integrador + Adopción", hrs:"6 horas", desc:"Cada participante presenta su solución IA: un agente desplegado, un Skill funcional y un flujo de informes automatizado. Se entrega el manual de adopción para el área.", topics:["Demo de agente en producción","Revisión de Skills por pares","Manual de adopción Copilot","Métricas de impacto","Plan de escalabilidad"], apps:[{name:"Teams",color:"#4B53BC"},{name:"PowerPoint",color:"#B7472A"},{name:"Loop",color:"#CC4A21"}] }
-    ];
+    <div class="contact-divider"></div>
 
-    // ── HERO CANVAS PARTICLES ─────────────────────────────────────
-    (function initCanvas() {
-      const canvas = document.getElementById('hero-canvas');
-      const ctx = canvas.getContext('2d');
-      let particles = [];
-      let W, H, raf;
+    <!-- Desarrollador -->
+    <div class="contact-card">
+      <div class="contact-card-icon" style="background:rgba(0,180,200,0.10)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="rgba(0,180,200,0.8)" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/>
+        </svg>
+      </div>
+      <div class="contact-card-body">
+        <div class="cc-role">Desarrollo &amp; Arquitectura Web</div>
+        <div class="cc-name">Rubén Araujo Carpio</div>
+        <div class="cc-links">
+          <a href="mailto:araujocarpio@gmail.com" class="cc-link">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+            araujocarpio@gmail.com
+          </a>
+          <span class="cc-link-sep"></span>
+          <a href="https://github.com/araujocarpio" target="_blank" rel="noopener noreferrer" class="cc-link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            github.com/araujocarpio
+          </a>
+        </div>
+      </div>
+    </div>
 
-      function resize() {
-        W = canvas.width = canvas.offsetWidth;
-        H = canvas.height = canvas.offsetHeight;
-      }
+  </div>
 
-      function Particle() {
-        this.reset();
-      }
+  <!-- Footer bar -->
+  <div class="footer-bar">
+    <div class="footer-bar-left">
+      <p>© 2026 Consultoría SCA · Programa IA para Champions Contables · Todos los derechos reservados</p>
+    </div>
+    <div class="footer-bar-right">
+      <a href="https://github.com/araujocarpio" target="_blank" rel="noopener noreferrer" class="footer-gh-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        Ver en GitHub
+      </a>
+    </div>
+  </div>
+</div>
 
-      Particle.prototype.reset = function() {
-        this.x = Math.random() * W;
-        this.y = Math.random() * H;
-        this.r = Math.random() * 1.5 + 0.4;
-        this.vx = (Math.random() - 0.5) * 0.3;
-        this.vy = (Math.random() - 0.5) * 0.3;
-        this.opacity = Math.random() * 0.6 + 0.15;
-      };
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const APPS = [
+  {
+    name: "Copilot en Excel",
+    sub: "Análisis financiero inteligente",
+    icon: "X",
+    iconBg: "#217346",
+    desc: "Copilot en Excel transforma tablas de datos en análisis narrativos. Genera ratios, detecta anomalías y produce interpretaciones ejecutivas de estados financieros.",
+    tags: ["Análisis Financiero", "Ratios", "EBITDA"],
+    uses: [
+      "Analiza el estado de resultados y genera un resumen ejecutivo con variaciones",
+      "Crea fórmulas de ratios de liquidez y explica su interpretación",
+      "Detecta outliers en el libro mayor y señala cuentas fuera de rango",
+      "Genera gráficos de tendencia con narrativa automática para gerencia"
+    ],
+    copilot: "Copilot en Excel"
+  },
+  {
+    name: "Copilot en Word",
+    sub: "Redacción de informes contables",
+    icon: "W",
+    iconBg: "#D83B01",
+    desc: "Convierte datos y tablas en informes profesionales. Genera borradores de memorandos, informes de auditoría, cartas tributarias y reportes de gestión en segundos.",
+    tags: ["Reportería Ejecutiva", "Auditoría", "NIIF"],
+    uses: [
+      "Redacta el informe de cierre mensual basado en el resumen financiero adjunto",
+      "Genera un borrador de respuesta a requerimiento DIAN con tono formal",
+      "Crea la nota explicativa de variaciones para los estados financieros",
+      "Convierte la tabla de conciliación en narrativa para junta directiva"
+    ],
+    copilot: "Copilot en Word"
+  },
+  {
+    name: "Copilot en Teams",
+    sub: "Asistente en reuniones financieras",
+    icon: "T",
+    iconBg: "#0078D4",
+    desc: "Copilot en Teams transcribe reuniones de comité financiero, genera actas automáticas, resume decisiones y asigna tareas pendientes al equipo contable.",
+    tags: ["Creador de Agentes", "Reuniones", "Seguimiento"],
+    uses: [
+      "Transcribe el comité de cierre y genera acta con acuerdos y responsables",
+      "Resume los puntos clave de la reunión con el auditor externo",
+      "Lista los pendientes tributarios acordados con fechas de entrega",
+      "Responde preguntas sobre el historial de decisiones del área"
+    ],
+    copilot: "Copilot en Teams"
+  },
+  {
+    name: "Copilot en Outlook",
+    sub: "Gestión de comunicaciones tributarias",
+    icon: "O",
+    iconBg: "#0F6CBD",
+    desc: "Redacta respuestas a clientes, proveedores y entes de control. Resume cadenas largas de emails tributarios y prioriza comunicaciones urgentes del área.",
+    tags: ["Skill Tributario", "Comunicación", "DIAN"],
+    uses: [
+      "Redacta respuesta formal al requerimiento DIAN adjunto en el email",
+      "Resume la cadena de correos con el cliente sobre el cierre fiscal",
+      "Prioriza los correos pendientes de proveedores con deuda en cartera",
+      "Genera borrador de notificación de vencimiento tributario a clientes"
+    ],
+    copilot: "Copilot en Outlook"
+  },
+  {
+    name: "Copilot en PowerPoint",
+    sub: "Presentaciones de resultados",
+    icon: "P",
+    iconBg: "#B7472A",
+    desc: "Transforma los datos del cierre en presentaciones ejecutivas listas para junta directiva. Genera slides con narrativa financiera, gráficos y conclusiones accionables.",
+    tags: ["Reportería Ejecutiva", "Análisis Financiero"],
+    uses: [
+      "Crea presentación de resultados Q2 basada en el Excel de estados financieros",
+      "Genera slide de variaciones vs presupuesto con análisis de causas",
+      "Diseña la presentación de cumplimiento tributario anual para socios",
+      "Produce el deck de gestión de riesgos contables para auditoría"
+    ],
+    copilot: "Copilot en PowerPoint"
+  },
+  {
+    name: "Copilot Studio",
+    sub: "Constructor de Agentes Contables",
+    icon: "🤖",
+    iconBg: "#0F3A68",
+    desc: "La herramienta sin código de Microsoft para construir agentes IA personalizados. Diseña agentes de conciliación, tributarios y de alertas que viven en Teams o la web.",
+    tags: ["Creador de Agentes", "Automatización"],
+    uses: [
+      "Crea el agente de conciliación bancaria que compara movimientos vs contabilidad",
+      "Diseña el bot de alertas tributarias que notifica vencimientos en Teams",
+      "Construye el asistente de consultas NIIF para el equipo contable",
+      "Despliega el agente de aprobación de facturas con flujo de revisión"
+    ],
+    copilot: "Copilot Studio"
+  },
+  {
+    name: "Copilot en SharePoint",
+    sub: "Base de conocimiento contable",
+    icon: "S",
+    iconBg: "#742774",
+    desc: "Conecta Copilot a tu base documental: normativas, políticas contables, contratos y soportes. Copilot responde preguntas sobre tus documentos internos con precisión.",
+    tags: ["Técnico Contable", "NIIF", "Normativa"],
+    uses: [
+      "¿Cuál es la política de reconocimiento de ingresos según nuestros documentos?",
+      "Resume los cambios de NIIF del trimestre en nuestros archivos de actualización",
+      "Encuentra todos los soportes de la declaración de renta 2024 indexados aquí",
+      "¿Qué dice nuestra política sobre capitalización de activos intangibles?"
+    ],
+    copilot: "Copilot en SharePoint"
+  },
+  {
+    name: "Microsoft Loop",
+    sub: "Colaboración contable en tiempo real",
+    icon: "L",
+    iconBg: "#CC4A21",
+    desc: "Copilot en Loop permite co-crear documentos financieros en tiempo real con el equipo. Ideal para cierres colaborativos, revisiones de auditoría y documentación de procesos.",
+    tags: ["Reportería Ejecutiva", "Técnico Contable"],
+    uses: [
+      "Genera el template de cierre mensual con secciones para cada área",
+      "Crea el checklist de auditoría interna con asignación de responsables",
+      "Produce la agenda del comité de cierre con puntos automáticos del mes",
+      "Resume los avances del equipo en el proceso de cierre trimestral"
+    ],
+    copilot: "Copilot en Loop"
+  }
+];
 
-      Particle.prototype.update = function() {
-        this.x += this.vx;
-        this.y += this.vy;
-        if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
-      };
+const SKILLS = [
+  {
+    icon: "🧾",
+    iconBg: "#FEE2E2",
+    accentColor: "#DC2626",
+    name: "Skill Tributario",
+    level: "Avanzado",
+    levelBg: "#FEE2E2",
+    levelColor: "#DC2626",
+    desc: "Convierte a Copilot en un experto tributario que conoce la normativa DIAN, IVA, retenciones, renta y declaraciones. Responde consultas, revisa borradores y genera alertas con base en normativa vigente.",
+    apps: [
+      { name: "Copilot en Outlook", color: "#0F6CBD" },
+      { name: "Copilot en Word",    color: "#D83B01" },
+      { name: "SharePoint",         color: "#742774" },
+    ],
+    prompts: [
+      { label: "Consulta normativa", text: "Revisa este borrador de declaración de retenciones y señala cualquier inconsistencia con la normativa DIAN vigente." },
+      { label: "Alerta de vencimiento", text: "Con base en el calendario tributario adjunto, lista las obligaciones que vencen en los próximos 15 días y clasifícalas por urgencia." },
+      { label: "Respuesta a requerimiento", text: "Redacta una respuesta formal al requerimiento ordinario DIAN adjunto, usando tono técnico-jurídico y argumentando desde normativa." },
+    ]
+  },
+  {
+    icon: "📊",
+    iconBg: "#DBEAFE",
+    accentColor: "#1D4ED8",
+    name: "Skill Análisis Financiero",
+    level: "Avanzado",
+    levelBg: "#DBEAFE",
+    levelColor: "#1D4ED8",
+    desc: "Motor de análisis de estados financieros integrado en Excel y Word. Calcula ratios, EBITDA, flujo de caja libre, genera narrativas para junta directiva y alerta desviaciones presupuestales.",
+    apps: [
+      { name: "Copilot en Excel",      color: "#217346" },
+      { name: "Copilot en PowerPoint", color: "#B7472A" },
+      { name: "Copilot en Word",       color: "#D83B01" },
+    ],
+    prompts: [
+      { label: "Análisis de ratios", text: "Calcula los ratios de liquidez, rentabilidad y endeudamiento con los datos del balance adjunto e interpreta cada uno en lenguaje ejecutivo." },
+      { label: "Narrativa para junta", text: "Redacta el análisis de resultados del trimestre comparado con el período anterior, destacando las 3 variaciones más relevantes y sus causas." },
+      { label: "Alerta presupuestal", text: "Compara el P&L real vs presupuesto y señala las líneas con desviación superior al 10%, con posibles causas y recomendaciones." },
+    ]
+  },
+  {
+    icon: "🔍",
+    iconBg: "#EDE9FE",
+    accentColor: "#7C3AED",
+    name: "Skill Técnico Contable",
+    level: "Avanzado",
+    levelBg: "#EDE9FE",
+    levelColor: "#7C3AED",
+    desc: "Valida asientos, detecta inconsistencias en el libro mayor, revisa conciliaciones bancarias, analiza partidas abiertas y apoya auditoría interna con razonamiento contable estructurado.",
+    apps: [
+      { name: "Copilot en Excel",    color: "#217346" },
+      { name: "Copilot en SharePoint", color: "#742774" },
+      { name: "Copilot en Word",     color: "#D83B01" },
+    ],
+    prompts: [
+      { label: "Revisión de asientos", text: "Analiza la relación de asientos del mes y señala los que tienen descripción incompleta, cuentas inusuales o montos fuera del rango histórico." },
+      { label: "Conciliación bancaria", text: "Compara el extracto bancario adjunto con el auxiliar contable e identifica las partidas en tránsito, errores y movimientos sin cruzar." },
+      { label: "Auditoría interna", text: "Revisa esta muestra de 20 facturas y verifica que cumplan con los requisitos de soporte según NIIF y política interna de la compañía." },
+    ]
+  },
+  {
+    icon: "🤖",
+    iconBg: "#D1FAE5",
+    accentColor: "#065F46",
+    name: "Skill Creador de Agentes",
+    level: "Experto",
+    levelBg: "#D1FAE5",
+    levelColor: "#065F46",
+    desc: "Metodología para diseñar y desplegar agentes contables en Copilot Studio. Incluye lógica de decisión, integración con datos de SharePoint, despliegue en Teams y gestión de errores.",
+    apps: [
+      { name: "Copilot Studio", color: "#0F3A68" },
+      { name: "Teams",          color: "#0078D4" },
+      { name: "SharePoint",     color: "#742774" },
+    ],
+    prompts: [
+      { label: "Diseño del agente", text: "Diseña la arquitectura del agente de conciliación: flujo de preguntas, fuentes de datos, condiciones de éxito y mensajes de error para el usuario." },
+      { label: "Instrucciones base", text: "Escribe el system prompt del agente tributario que debe responder consultas DIAN usando solo los documentos cargados en SharePoint." },
+      { label: "Prueba de calidad", text: "Genera 10 casos de prueba para el agente de alertas tributarias, incluyendo casos límite y situaciones de error que debe manejar correctamente." },
+    ]
+  },
+  {
+    icon: "📋",
+    iconBg: "#FEF3C7",
+    accentColor: "#92400E",
+    name: "Skill Reportería Ejecutiva",
+    level: "Intermedio",
+    levelBg: "#FEF3C7",
+    levelColor: "#92400E",
+    desc: "Genera informes ejecutivos automáticos: cierres mensuales, presentaciones para socios y dashboards narrativos. Transforma datos crudos en lenguaje de negocio comprensible para no contadores.",
+    apps: [
+      { name: "Copilot en PowerPoint", color: "#B7472A" },
+      { name: "Copilot en Word",       color: "#D83B01" },
+      { name: "Copilot en Loop",       color: "#CC4A21" },
+    ],
+    prompts: [
+      { label: "Informe de cierre", text: "Con el resumen financiero adjunto, redacta el informe ejecutivo del mes para la gerencia general: máximo 1 página, sin tecnicismos contables." },
+      { label: "Presentación de resultados", text: "Crea la estructura de la presentación de resultados semestrales: 8 slides con títulos, puntos clave y el mensaje principal de cada una." },
+      { label: "Resumen para socios", text: "Resume el estado financiero del trimestre en 5 puntos ejecutivos: lo que fue bien, lo que preocupa, y la recomendación principal para Q+1." },
+    ]
+  },
+];
 
-      function init() {
-        resize();
-        particles = Array.from({length: 80}, () => new Particle());
-      }
+const MODULES = [
+  {
+    num: "I",
+    color: "#0078D4",
+    name: "Fundamentos: Copilot para Contadores",
+    hrs: "10 horas",
+    desc: "Comprende cómo funciona Copilot, qué puede y no puede hacer en contabilidad, y domina la técnica de prompting aplicada a casos financieros reales.",
+    topics: ["Cómo funciona Copilot", "Prompt engineering contable", "Copilot en Excel básico", "Copilot en Word y Outlook", "Ética IA y validación de salidas"],
+    apps: [
+      { name: "Excel", color: "#217346" },
+      { name: "Word", color: "#D83B01" },
+      { name: "Outlook", color: "#0F6CBD" },
+    ]
+  },
+  {
+    num: "II",
+    color: "#7C3AED",
+    name: "Construcción de Skills Especializados",
+    hrs: "12 horas",
+    desc: "Diseña y calibra los 5 Skills del programa: Tributario, Análisis Financiero, Técnico Contable, Creador de Agentes y Reportería. Cada uno sobre el ecosistema M365.",
+    topics: ["Anatomía de un Skill", "Skill Tributario + DIAN", "Skill de Análisis Financiero", "Skill Técnico Contable", "Testing y refinado con casos reales"],
+    apps: [
+      { name: "SharePoint", color: "#742774" },
+      { name: "Excel", color: "#217346" },
+      { name: "Word", color: "#D83B01" },
+    ]
+  },
+  {
+    num: "III",
+    color: "#065F46",
+    name: "Agentes Contables en Copilot Studio",
+    hrs: "12 horas",
+    desc: "Diseña y despliega agentes autónomos sin código en Copilot Studio: el agente conciliador, el bot de alertas tributarias y el asistente NIIF del equipo.",
+    topics: ["Arquitectura de agentes", "Agente de conciliación bancaria", "Bot de alertas tributarias", "Asistente NIIF con SharePoint", "Despliegue en Teams"],
+    apps: [
+      { name: "Copilot Studio", color: "#0F3A68" },
+      { name: "Teams", color: "#0078D4" },
+      { name: "SharePoint", color: "#742774" },
+    ]
+  },
+  {
+    num: "IV",
+    color: "#92400E",
+    name: "Proyecto Integrador + Adopción",
+    hrs: "6 horas",
+    desc: "Cada participante presenta su solución IA: un agente desplegado, un Skill funcional y un flujo de informes automatizado. Se entrega el manual de adopción para el área.",
+    topics: ["Demo de agente en producción", "Revisión de Skills por pares", "Manual de adopción Copilot", "Métricas de impacto", "Plan de escalabilidad"],
+    apps: [
+      { name: "Teams", color: "#0078D4" },
+      { name: "PowerPoint", color: "#B7472A" },
+      { name: "Loop", color: "#CC4A21" },
+    ]
+  },
+];
 
-      function draw() {
-        ctx.clearRect(0, 0, W, H);
-        particles.forEach(p => {
-          p.update();
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(80, 180, 240, ${p.opacity})`;
-          ctx.fill();
-        });
+// ── RENDER APPS ───────────────────────────────────────────────
+function renderApps() {
+  const grid = document.getElementById('apps-grid');
+  grid.innerHTML = APPS.map((app, i) => `
+    <div class="app-card reveal">
+      <div class="app-header">
+        <div class="app-ico" style="background:${app.iconBg};color:#fff">${app.icon}</div>
+        <div class="app-name-block">
+          <div class="app-name">${app.name}</div>
+          <div class="app-sub">${app.sub}</div>
+        </div>
+      </div>
+      <div class="app-body">
+        <p class="app-desc">${app.desc}</p>
+        <div class="skill-tags">${app.tags.map(t => `<span class="stag">${t}</span>`).join('')}</div>
+        <div class="use-cases">
+          <h4>Prompts contables en esta app</h4>
+          <ul>${app.uses.map(u => `<li>${u}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <div class="app-footer">
+        <span class="copilot-label">${app.copilot}</span>
+      </div>
+    </div>
+  `).join('');
+}
 
-        // connecting lines
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if (dist < 90) {
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.strokeStyle = `rgba(80, 180, 240, ${0.12 * (1 - dist/90)})`;
-              ctx.lineWidth = 0.6;
-              ctx.stroke();
-            }
-          }
+// ── RENDER SKILLS ─────────────────────────────────────────────
+function renderSkills() {
+  const sidebar = document.getElementById('skills-sidebar');
+  sidebar.innerHTML = SKILLS.map((s, i) => `
+    <button class="skill-btn${i === 0 ? ' active' : ''}" onclick="selectSkill(${i})">
+      <div class="sbtn-icon" style="background:${s.iconBg}">${s.icon}</div>
+      <div class="sbtn-text">
+        <div class="sbtn-name">${s.name}</div>
+        <div class="sbtn-level">${s.level}</div>
+      </div>
+    </button>
+  `).join('');
+  selectSkill(0);
+}
+
+function selectSkill(idx) {
+  document.querySelectorAll('.skill-btn').forEach((b,i) => b.classList.toggle('active', i === idx));
+  const s = SKILLS[idx];
+  document.getElementById('skill-detail-panel').innerHTML = `
+    <div class="sdp-header">
+      <div class="sdp-icon" style="background:${s.iconBg};font-size:28px">${s.icon}</div>
+      <div class="sdp-meta">
+        <h2>${s.name}</h2>
+        <p>${s.desc}</p>
+        <span class="level-pill" style="background:${s.levelBg};color:${s.accentColor}">${s.level}</span>
+      </div>
+    </div>
+    <div class="sdp-section-title">Apps M365 utilizadas</div>
+    <div class="apps-used">
+      ${s.apps.map(a => `
+        <div class="app-pill">
+          <span class="ap-dot" style="background:${a.color}"></span>
+          ${a.name}
+        </div>
+      `).join('')}
+    </div>
+    <div class="sdp-section-title" style="margin-top:20px">Prompts de ejemplo</div>
+    <div class="prompts-list">
+      ${s.prompts.map(p => `
+        <div class="prompt-item">
+          <strong>${p.label}</strong>
+          "${p.text}"
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── RENDER MODULES ────────────────────────────────────────────
+function renderModules() {
+  const tl = document.getElementById('modules-timeline');
+  tl.innerHTML = MODULES.map(m => `
+    <div class="module-item">
+      <div class="module-num" style="background:${m.color}">${m.num}</div>
+      <div class="module-body">
+        <div class="module-header">
+          <h3>${m.name}</h3>
+          <span class="mod-hrs">${m.hrs}</span>
+        </div>
+        <p class="module-desc">${m.desc}</p>
+        <div class="mod-topics">
+          ${m.topics.map(t => `<span class="mod-topic">${t}</span>`).join('')}
+        </div>
+        <div class="mod-apps">
+          <span class="label">Copilot en:</span>
+          ${m.apps.map(a => `<span class="mod-app-tag" style="background:${a.color}">${a.name}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── TAB SYSTEM ────────────────────────────────────────────────
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'apps' && !document.getElementById('apps-grid').children.length) renderApps();
+  if (id === 'skills' && !document.getElementById('skills-sidebar').children.length) renderSkills();
+  if (id === 'modulos' && !document.getElementById('modules-timeline').children.length) renderModules();
+  // Re-trigger scroll observer on tab change
+  setTimeout(observeReveal, 50);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── SCROLL REVEAL ─────────────────────────────────────────────
+function observeReveal() {
+  const els = document.querySelectorAll('.reveal:not(.visible)');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // stagger children of grids
+        const parent = entry.target.closest('.lm-content-grid, .lm-compromisos-grid, .apps-grid, .modules-timeline, .pitch, .stats-row');
+        if (parent) {
+          const siblings = Array.from(parent.querySelectorAll('.reveal'));
+          const idx = siblings.indexOf(entry.target);
+          entry.target.style.transitionDelay = (idx * 0.07) + 's';
         }
-
-        raf = requestAnimationFrame(draw);
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
       }
-
-      init();
-      draw();
-      window.addEventListener('resize', () => { resize(); });
-    })();
-
-    // ── HERO ENTRANCE ─────────────────────────────────────────────
-    window.addEventListener('load', () => {
-      requestAnimationFrame(() => {
-        document.querySelector('.hero-left').classList.add('in');
-        document.querySelector('.m365-panel-wrap').classList.add('in');
-      });
     });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(el => io.observe(el));
+}
 
-    // ── SCROLL PROGRESS ───────────────────────────────────────────
-    const progressBar = document.getElementById('scroll-progress');
-    const nav = document.getElementById('main-nav');
+// init
+renderApps();
+renderSkills();
+renderModules();
 
-    window.addEventListener('scroll', () => {
-      const scrolled = window.scrollY;
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      progressBar.style.width = (scrolled / total * 100) + '%';
-      nav.classList.toggle('scrolled', scrolled > 20);
-    }, { passive: true });
+// Add reveal class to existing section elements
+document.querySelectorAll('.stat-card, .pitch-card, .app-card, .module-item, .skill-btn').forEach(el => {
+  el.classList.add('reveal');
+});
 
-    // ── INTERSECTION OBSERVER (reveal) ────────────────────────────
-    const revealObs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          revealObs.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0, rootMargin: '0px 0px -20px 0px' });
-
-    function observeReveals() {
-      document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
-        // show immediately if already in viewport
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          el.classList.add('visible');
-        } else {
-          revealObs.observe(el);
-        }
-      });
-    }
-
-    requestAnimationFrame(observeReveals);
-
-    // ── COUNTER ANIMATION ─────────────────────────────────────────
-    function animateCount(el, target, duration = 1200) {
-      const start = performance.now();
-      const update = (now) => {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(eased * target);
-        if (progress < 1) requestAnimationFrame(update);
-      };
-      requestAnimationFrame(update);
-    }
-
-    const counterObs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          const target = parseInt(e.target.dataset.count);
-          animateCount(e.target, target);
-          counterObs.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.5 });
-
-    document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
-
-    // ── RENDER APPS ────────────────────────────────────────────────
-    function renderApps() {
-      const grid = document.getElementById('apps-grid');
-      grid.innerHTML = APPS.map((app, i) => `
-        <div class="app-card" style="transition-delay:${i * 0.06}s">
-          <div class="app-header">
-            <div class="app-ico" style="background:${app.iconBg};color:#fff">${app.icon}</div>
-            <div class="app-name-block">
-              <div class="app-name">${app.name}</div>
-              <div class="app-sub">${app.sub}</div>
-            </div>
-          </div>
-          <div class="app-body">
-            <p class="app-desc">${app.desc}</p>
-            <div class="skill-tags">${app.tags.map(t => `<span class="stag">${t}</span>`).join('')}</div>
-            <div class="use-cases">
-              <h4><i class="bi bi-chat-left-text"></i> Prompts contables en esta app</h4>
-              <ul>${app.uses.map(u => `<li><i class="bi bi-dot"></i>${u}</li>`).join('')}</ul>
-            </div>
-          </div>
-          <div class="app-footer">
-            <span class="copilot-label"><i class="bi bi-stars"></i>${app.copilot}</span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // ── RENDER SKILLS ─────────────────────────────────────────────
-    function renderSkills() {
-      const sidebar = document.getElementById('skills-sidebar');
-      sidebar.innerHTML = SKILLS.map((s, i) => `
-        <button class="skill-btn${i === 0 ? ' active' : ''}" onclick="selectSkill(${i})">
-          <div class="sbtn-icon" style="background:${s.iconBg}">${s.icon}</div>
-          <div class="sbtn-text">
-            <div class="sbtn-name">${s.name}</div>
-            <div class="sbtn-level">${s.level}</div>
-          </div>
-        </button>
-      `).join('');
-      selectSkill(0);
-    }
-
-    function selectSkill(idx) {
-      document.querySelectorAll('.skill-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
-      const panel = document.getElementById('skill-detail-panel');
-      panel.classList.add('switching');
-
-      setTimeout(() => {
-        const s = SKILLS[idx];
-        panel.innerHTML = `
-          <div class="sdp-header">
-            <div class="sdp-icon" style="background:${s.iconBg}">${s.icon}</div>
-            <div class="sdp-meta">
-              <h2>${s.name}</h2>
-              <p>${s.desc}</p>
-              <span class="level-pill" style="background:${s.levelBg};color:${s.accentColor}">${s.level}</span>
-            </div>
-          </div>
-          <div class="sdp-section-title"><i class="bi bi-app"></i> Apps M365 utilizadas</div>
-          <div class="apps-used">
-            ${s.apps.map(a => `<div class="app-pill"><span class="ap-dot" style="background:${a.color}"></span>${a.name}</div>`).join('')}
-          </div>
-          <div class="sdp-section-title" style="margin-top:20px"><i class="bi bi-chat-left-quote"></i> Prompts de ejemplo</div>
-          <div class="prompts-list">
-            ${s.prompts.map(p => `
-              <div class="prompt-item">
-                <strong><i class="bi bi-tag"></i> ${p.label}</strong>
-                "${p.text}"
-              </div>
-            `).join('')}
-          </div>
-        `;
-        panel.classList.remove('switching');
-      }, 160);
-    }
-
-    // ── RENDER MODULES ────────────────────────────────────────────
-    function renderModules() {
-      const tl = document.getElementById('modules-timeline');
-      tl.innerHTML = MODULES.map(m => `
-        <div class="module-item">
-          <div class="module-num" style="background:linear-gradient(135deg,${m.color},${m.color}cc)">${m.num}</div>
-          <div class="module-body">
-            <div class="module-header">
-              <h3>${m.name}</h3>
-              <span class="mod-hrs"><i class="bi bi-clock"></i>${m.hrs}</span>
-            </div>
-            <p class="module-desc">${m.desc}</p>
-            <div class="mod-topics">${m.topics.map(t => `<span class="mod-topic">${t}</span>`).join('')}</div>
-            <div class="mod-apps">
-              <span class="label">Copilot en:</span>
-              ${m.apps.map(a => `<span class="mod-app-tag" style="background:${a.color}">${a.name}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // ── TAB SYSTEM ────────────────────────────────────────────────
-    function showTab(id, el) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      if (el) el.classList.add('active');
-
-      // re-observe reveals in the newly visible section
-      setTimeout(observeReveals, 50);
-
-      if (id === 'apps' && !document.getElementById('apps-grid').children.length) renderApps();
-      if (id === 'skills' && !document.getElementById('skills-sidebar').children.length) renderSkills();
-      if (id === 'modulos' && !document.getElementById('modules-timeline').children.length) renderModules();
-    }
-
-    // init all sections
-    renderApps();
-    renderSkills();
-    renderModules();
-  </script>
+// Start observer after a short delay to let content render
+setTimeout(observeReveal, 100);
+</script>
 </body>
-
 </html>
